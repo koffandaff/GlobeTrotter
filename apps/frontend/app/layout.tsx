@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
@@ -26,9 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div className="app-shell">
           <Navigation />
           {children}
-          <footer className="site-footer">
-            GlobeTrotter — Hackathon Prototype · Static demo, no data is saved
-          </footer>
+          <footer className="site-footer">GlobeTrotter — Hackathon</footer>
         </div>
       </body>
     </html>
