@@ -54,6 +54,9 @@ export async function getTopActivities() {
 }
 
 export async function getUsersList(query: UsersQuery) {
+  const page = Math.max(1, Number(query.page) || 1);
+  const limit = Math.max(1, Number(query.limit) || 50);
+
   const where = query.search ? {
     OR: [
       { email: { contains: query.search, mode: "insensitive" as const } },
@@ -67,8 +70,8 @@ export async function getUsersList(query: UsersQuery) {
     prisma.user.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      skip: (query.page - 1) * query.limit,
-      take: query.limit,
+      skip: (page - 1) * limit,
+      take: limit,
       select: {
         id: true,
         email: true,
@@ -102,6 +105,9 @@ export async function updateUserStatus(userId: string, data: UpdateUserDto) {
 }
 
 export async function getLogsList(query: LogsQuery) {
+  const page = Math.max(1, Number(query.page) || 1);
+  const limit = Math.max(1, Number(query.limit) || 50);
+
   const where = {
     ...(query.type && { action: query.type }),
     ...(query.userId && { userId: query.userId }),
@@ -117,8 +123,8 @@ export async function getLogsList(query: LogsQuery) {
     prisma.auditLog.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      skip: (query.page - 1) * query.limit,
-      take: query.limit,
+      skip: (page - 1) * limit,
+      take: limit,
       include: {
         user: { select: { id: true, email: true } }
       }
