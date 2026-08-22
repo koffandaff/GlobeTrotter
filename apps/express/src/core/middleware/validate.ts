@@ -39,9 +39,7 @@ export function validateParams<TSchema extends z.ZodType<Record<string, string>>
   };
 }
 
-export function validateQuery<TSchema extends z.ZodType<Record<string, string | string[] | undefined>>>(
-  schema: TSchema
-): RequestHandler {
+export function validateQuery<TSchema extends z.ZodType>(schema: TSchema): RequestHandler {
   return (req, _res, next) => {
     const result = schema.safeParse(req.query);
 
@@ -50,7 +48,7 @@ export function validateQuery<TSchema extends z.ZodType<Record<string, string | 
       return;
     }
 
-    (req.query as Record<string, string | string[] | undefined>) = result.data;
+    Object.assign(req.query, result.data);
     next();
   };
 }
