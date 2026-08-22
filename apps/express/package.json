@@ -9,7 +9,9 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "tsx tests/backend-e2e.ts",
+    "test:e2e": "tsx tests/backend-e2e.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
