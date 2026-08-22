@@ -1,4 +1,4 @@
-import { prisma } from "../db/prisma";
+import { prisma } from "../../shared/prisma";
 
 export interface AuditLogEntry {
   userId?: string;
