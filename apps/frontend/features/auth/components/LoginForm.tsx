@@ -32,7 +32,6 @@ export function LoginForm() {
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-<<<<<<< HEAD
   // Check for saved avatar on mount
   React.useEffect(() => {
     const avatar = localStorage.getItem("userAvatar");
@@ -41,21 +40,14 @@ export function LoginForm() {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-=======
   const handleSubmit = async (e: React.FormEvent) => {
->>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     e.preventDefault();
     setEmailError("");
     setPasswordError("");
     setSubmitError("");
     let isValid = true;
 
-<<<<<<< HEAD
     // Validate email
-=======
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
->>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     if (!emailRegex.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       isValid = false;
@@ -98,10 +90,10 @@ export function LoginForm() {
         <p>Access your trips, budgets, and saved plans.</p>
       </div>
 
-      {email.includes("@") && (
+      {email.includes("@") && savedAvatar && (
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
           <img
-            src={savedAvatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(email)}`}
+            src={savedAvatar}
             alt="User avatar"
             style={{
               width: "96px",
