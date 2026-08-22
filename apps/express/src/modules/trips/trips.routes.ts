@@ -9,9 +9,13 @@ import {
   updateTripSchema,
 } from "./trips.schema";
 
+import { nestedTripStopsRouter } from "../trip-stops";
+
 const router = Router();
 
 router.use(authenticate);
+
+router.use("/:tripId/stops", nestedTripStopsRouter);
 
 router.get("/", validateQuery(listTripsQuerySchema), tripsController.listTrips);
 
