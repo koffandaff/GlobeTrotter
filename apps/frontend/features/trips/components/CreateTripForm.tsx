@@ -51,6 +51,16 @@ export function CreateTripForm() {
       newErrors.name = "Trip name must be at most 200 characters.";
     }
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (formData.startDate) {
+      const start = new Date(formData.startDate);
+      if (start < today) {
+        newErrors.startDate = "Start date cannot be in the past.";
+      }
+    }
+
     if (formData.startDate && formData.endDate) {
       if (new Date(formData.endDate) < new Date(formData.startDate)) {
         newErrors.endDate = "End date must be on or after start date.";
@@ -85,8 +95,8 @@ export function CreateTripForm() {
         coverImageUrl: formData.coverImageUrl?.trim() || undefined,
       };
 
-      await createTrip(payload);
-      router.push("/my-trips");
+      const newTrip = await createTrip(payload);
+      router.push(`/itinerary-builder?tripId=${newTrip.id}`);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Failed to create trip. Please try again.");
     } finally {
@@ -166,16 +176,22 @@ export function CreateTripForm() {
             id="startDate"
             name="startDate"
             type="date"
+            min={new Date().toISOString().split("T")[0]}
             value={formData.startDate || ""}
             onChange={handleChange}
             style={{
               width: "100%",
               padding: "10px 14px",
               borderRadius: "var(--radius-sm)",
-              border: "1px solid var(--color-border)",
+              border: errors.startDate ? "1.5px solid var(--color-danger)" : "1px solid var(--color-border)",
               fontSize: "0.92rem",
             }}
           />
+          {errors.startDate && (
+            <span style={{ color: "var(--color-danger)", fontSize: "0.82rem", marginTop: "4px", display: "block" }}>
+              {errors.startDate}
+            </span>
+          )}
         </div>
 
         <div className="field">
@@ -186,6 +202,7 @@ export function CreateTripForm() {
             id="endDate"
             name="endDate"
             type="date"
+            min={formData.startDate || new Date().toISOString().split("T")[0]}
             value={formData.endDate || ""}
             onChange={handleChange}
             style={{
@@ -217,9 +234,12 @@ export function CreateTripForm() {
           <label htmlFor="currency" style={{ fontWeight: 600, display: "block", marginBottom: "6px" }}>
             Currency
           </label>
-          <select
+          <input
             id="currency"
             name="currency"
+            type="text"
+            list="currencies"
+            placeholder="e.g. USD, EUR, INR..."
             value={formData.currency}
             onChange={handleChange}
             style={{
@@ -229,16 +249,17 @@ export function CreateTripForm() {
               border: "1px solid var(--color-border)",
               background: "#ffffff",
               fontSize: "0.92rem",
-              cursor: "pointer",
             }}
-          >
+          />
+          <datalist id="currencies">
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
             <option value="GBP">GBP (£)</option>
             <option value="JPY">JPY (¥)</option>
             <option value="CAD">CAD ($)</option>
             <option value="AUD">AUD ($)</option>
-          </select>
+            <option value="INR">INR (₹)</option>
+          </datalist>
         </div>
 
         <div className="field">

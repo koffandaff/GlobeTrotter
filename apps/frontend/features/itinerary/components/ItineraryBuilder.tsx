@@ -416,6 +416,11 @@ export function ItineraryBuilder({ initialTripId }: ItineraryBuilderProps) {
         isOpen={!!activeStopForActivity}
         stopId={activeStopForActivity?.id || null}
         stopCityName={activeStopForActivity?.name}
+        existingItems={
+          itinerary?.stops
+            .find((s) => s.id === activeStopForActivity?.id)
+            ?.days?.flatMap((d) => d.items) || []
+        }
         onClose={() => setActiveStopForActivity(null)}
         onAddActivity={addActivity}
       />

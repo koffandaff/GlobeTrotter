@@ -9,12 +9,14 @@ interface AddActivityModalProps {
   stopCityName?: string;
   onClose: () => void;
   onAddActivity: (stopId: string, data: AddActivityInput) => Promise<{ success: boolean; error?: string }>;
+  existingItems?: any[]; // Array of ItineraryItem
 }
 
 export function AddActivityModal({
   isOpen,
   stopId,
   stopCityName,
+  existingItems = [],
   onClose,
   onAddActivity,
 }: AddActivityModalProps) {
@@ -36,14 +38,49 @@ export function AddActivityModal({
       return;
     }
 
+    if (cost !== undefined && cost < 0) {
+      setError("Cost must be a positive number.");
+      return;
+    }
+
+    const start = startTime ? startTime.slice(0, 5) : undefined;
+    const end = endTime ? endTime.slice(0, 5) : undefined;
+
+    if (start && end && start > end) {
+      setError("Start time cannot be after end time.");
+      return;
+    }
+
+    // Time overlap checking
+    if (date && start && end) {
+      const hasOverlap = existingItems.some(item => {
+        if (!item.date || !item.startTime || !item.endTime) return false;
+        // Strip time portion of date for safe comparison
+        const itemDateStr = item.date.split("T")[0];
+        const newDateStr = date;
+        
+        if (itemDateStr === newDateStr) {
+          const itemStart = item.startTime.slice(0, 5);
+          const itemEnd = item.endTime.slice(0, 5);
+          return (start < itemEnd && end > itemStart); // Overlap condition
+        }
+        return false;
+      });
+
+      if (hasOverlap) {
+        setError("This time slot overlaps with an existing activity.");
+        return;
+      }
+    }
+
     setError(null);
     setIsSubmitting(true);
 
     const res = await onAddActivity(stopId, {
       title: title.trim(),
       date: date || undefined,
-      startTime: startTime || undefined,
-      endTime: endTime || undefined,
+      startTime: start,
+      endTime: end,
       estimatedCost: cost,
       notes: notes.trim() || undefined,
     });
@@ -212,6 +249,7 @@ export function AddActivityModal({
               <input
                 id="activityDate"
                 type="date"
+                min={new Date().toISOString().split("T")[0]}
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 style={{
