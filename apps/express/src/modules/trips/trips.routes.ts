@@ -10,12 +10,14 @@ import {
 } from "./trips.schema";
 
 import { nestedTripStopsRouter } from "../trip-stops";
+import { budgetRouter } from "../budget";
 
 const router = Router();
 
 router.use(authenticate);
 
 router.use("/:tripId/stops", nestedTripStopsRouter);
+router.use("/", budgetRouter);
 
 router.get("/", validateQuery(listTripsQuerySchema), tripsController.listTrips);
 
