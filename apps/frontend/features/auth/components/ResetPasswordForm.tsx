@@ -35,7 +35,7 @@ export function ResetPasswordForm() {
       setIsSubmitting(true);
       await fetchApi("/auth/reset-password", {
         method: "POST",
-        body: JSON.stringify({ email, code, newPassword }),
+        body: JSON.stringify({ email, otp: code, newPassword }),
       });
       setSuccess(true);
       setTimeout(() => {
