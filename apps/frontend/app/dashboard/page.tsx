@@ -1,7 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useAuthGuard } from "@/lib/auth/useAuthGuard";
+import { apiClient } from "@/lib/api/client";
 
 interface RecentTrip {
   id: string;
@@ -41,66 +44,11 @@ interface BudgetHighlights {
   byCategory: BudgetCategory[];
 }
 
-const mockRecentTrips: RecentTrip[] = [
-  {
-    id: "1",
-    name: "Summer in Kyoto",
-    description: "A two-week cultural immersion in Japan's historic capital.",
-    coverImageUrl: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600&auto=format&fit=crop",
-    startDate: "2026-06-15",
-    endDate: "2026-06-29",
-    status: "Planned",
-    totalEstimatedCost: 4500,
-    currency: "USD",
-    stopsCount: 3,
-  },
-  {
-    id: "2",
-    name: "Weekend in Paris",
-    description: "Quick getaway for anniversary.",
-    coverImageUrl: "https://images.unsplash.com/photo-1502602898657-3e907a5ea582?q=80&w=600&auto=format&fit=crop",
-    startDate: "2026-04-10",
-    endDate: "2026-04-13",
-    status: "Completed",
-    totalEstimatedCost: 1200,
-    currency: "USD",
-    stopsCount: 1,
-  },
-];
-
-const mockRecommendedDestinations: RecommendedDestination[] = [
-  {
-    id: "d1",
-    name: "Bali",
-    country: "Indonesia",
-    imageUrl: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=600&auto=format&fit=crop",
-    costIndex: 3.2,
-    popularityScore: 9.5,
-    reason: "Because you liked tropical destinations.",
-  },
-  {
-    id: "d2",
-    name: "Rome",
-    country: "Italy",
-    imageUrl: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=600&auto=format&fit=crop",
-    costIndex: 7.8,
-    popularityScore: 9.8,
-    reason: "Based on your interest in history and cuisine.",
-  }
-];
-
-const mockBudgetHighlights: BudgetHighlights = {
-  totalBudget: 6000,
-  totalSpent: 1250,
-  totalEstimated: 4750,
-  currency: "USD",
-  byCategory: [
-    { category: "Flights", budget: 2000, spent: 1100, estimated: 900 },
-    { category: "Accommodation", budget: 2500, spent: 150, estimated: 2350 },
-    { category: "Food & Dining", budget: 1000, spent: 0, estimated: 1000 },
-    { category: "Activities", budget: 500, spent: 0, estimated: 500 }
-  ]
-};
+interface DashboardData {
+  recentTrips: RecentTrip[];
+  recommendedDestinations: RecommendedDestination[];
+  budgetHighlights: BudgetHighlights;
+}
 
 function formatCurrency(amount: number | null, currency = "USD"): string {
   if (amount === null || amount === undefined) return "—";
@@ -130,17 +78,64 @@ function getStatusBadgeClass(status: string): string {
 }
 
 function DashboardPage() {
-  const recentTrips = mockRecentTrips;
-  const recommendedDestinations = mockRecommendedDestinations;
-  const budgetHighlights = mockBudgetHighlights;
+  const { user } = useAuth();
+  useAuthGuard(); // Redirects to /login if not authenticated
+
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadDashboard() {
+      try {
+        const result = await apiClient<DashboardData>("/dashboard");
+        setData(result);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load dashboard");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadDashboard();
+  }, []);
+
+  const recentTrips = data?.recentTrips ?? [];
+  const recommendedDestinations = data?.recommendedDestinations ?? [];
+  const budgetHighlights = data?.budgetHighlights ?? {
+    totalBudget: null,
+    totalSpent: 0,
+    totalEstimated: 0,
+    currency: "USD",
+    byCategory: [],
+  };
+
+  if (isLoading) {
+    return (
+      <main className="page-main">
+        <div className="page-header">
+          <div className="eyebrow">Home</div>
+          <h1>Dashboard</h1>
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", padding: "60px 0" }}>
+          <div className="spinner" />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="page-main">
       <div className="page-header">
         <div className="eyebrow">Home</div>
-        <h1>Dashboard</h1>
+        <h1>Welcome back{user ? `, ${user.firstName}` : ""}!</h1>
         <p>Your travel overview at a glance</p>
       </div>
+
+      {error && (
+        <div className="card" style={{ borderLeft: "4px solid var(--color-danger)", marginBottom: "var(--space-4)", color: "var(--color-danger)" }}>
+          {error} — showing empty state.
+        </div>
+      )}
 
       {/* Budget Highlights */}
       <div className="section">
@@ -167,30 +162,32 @@ function DashboardPage() {
           </div>
         </div>
 
-        <div className="card" style={{ marginTop: "var(--space-4)" }}>
-          <h3 style={{ marginBottom: "var(--space-3)" }}>By Category</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-            {budgetHighlights.byCategory.map((cat) => (
-              <div key={cat.category} className="list-row">
-                <div>
-                  <div style={{ textTransform: "capitalize", fontWeight: 500 }}>{cat.category.toLowerCase()}</div>
-                  <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
-                    Budget: {cat.budget ? formatCurrency(cat.budget, budgetHighlights.currency) : "Not set"}
-                    {cat.spent > 0 && ` • Spent: ${formatCurrency(cat.spent, budgetHighlights.currency)}`}
+        {budgetHighlights.byCategory.length > 0 && (
+          <div className="card" style={{ marginTop: "var(--space-4)" }}>
+            <h3 style={{ marginBottom: "var(--space-3)" }}>By Category</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+              {budgetHighlights.byCategory.map((cat) => (
+                <div key={cat.category} className="list-row">
+                  <div>
+                    <div style={{ textTransform: "capitalize", fontWeight: 500 }}>{cat.category.toLowerCase()}</div>
+                    <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                      Budget: {cat.budget ? formatCurrency(cat.budget, budgetHighlights.currency) : "Not set"}
+                      {cat.spent > 0 && ` • Spent: ${formatCurrency(cat.spent, budgetHighlights.currency)}`}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontWeight: 600, fontSize: "1.1rem" }}>
+                      {formatCurrency(cat.spent, budgetHighlights.currency)}
+                    </div>
+                    <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                      {cat.estimated > 0 && `Est. ${formatCurrency(cat.estimated, budgetHighlights.currency)}`}
+                    </div>
                   </div>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontWeight: 600, fontSize: "1.1rem" }}>
-                    {formatCurrency(cat.spent, budgetHighlights.currency)}
-                  </div>
-                  <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
-                    {cat.estimated > 0 && `Est. ${formatCurrency(cat.estimated, budgetHighlights.currency)}`}
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Recent Trips */}
@@ -212,7 +209,7 @@ function DashboardPage() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
             {recentTrips.map((trip) => (
-              <Link key={trip.id} href={`/trip/${trip.id}`} className="trip-card" style={{ textDecoration: "none" }}>
+              <Link key={trip.id} href={`/itinerary-builder?tripId=${trip.id}`} className="trip-card" style={{ textDecoration: "none" }}>
                 <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "flex-start" }}>
                   <div
                     className="trip-card-thumb"
@@ -277,7 +274,7 @@ function DashboardPage() {
         ) : (
           <div className="grid grid-3">
             {recommendedDestinations.map((dest) => (
-              <Link key={dest.id} href={`/city/${dest.id}`} className="card" style={{ textDecoration: "none", display: "flex", flexDirection: "column" }}>
+              <Link key={dest.id} href={`/city-search?city=${encodeURIComponent(dest.name)}`} className="card" style={{ textDecoration: "none", display: "flex", flexDirection: "column" }}>
                 <div
                   style={{
                     height: 120,

@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { BudgetView } from "@/features/budget/components/BudgetView";
+import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 
 export const metadata: Metadata = {
   title: "Budget & Cost Breakdown",
@@ -9,10 +10,12 @@ export const metadata: Metadata = {
 
 export default function BudgetPage() {
   return (
-    <main className="page-main">
-      <Suspense fallback={<div className="spinner" style={{ margin: "40px auto" }} />}>
-        <BudgetView />
-      </Suspense>
-    </main>
+    <ProtectedRoute>
+      <main className="page-main">
+        <Suspense fallback={<div className="spinner" style={{ margin: "40px auto" }} />}>
+          <BudgetView />
+        </Suspense>
+      </main>
+    </ProtectedRoute>
   );
 }

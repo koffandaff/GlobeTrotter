@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { ActivitySearch } from "@/features/activities/components/ActivitySearch";
+import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 
 export const metadata: Metadata = {
   title: "Activity Search & Experiences",
@@ -9,15 +10,16 @@ export const metadata: Metadata = {
 
 export default function ActivitySearchPage() {
   return (
-    <main className="page-main">
-      <div className="page-header">
-        <h1>Activity Search</h1>
-        <p>Find things to do and add them directly to your itinerary.</p>
-      </div>
-
-      <Suspense fallback={<div className="spinner" style={{ margin: "40px auto" }} />}>
-        <ActivitySearch />
-      </Suspense>
-    </main>
+    <ProtectedRoute>
+      <main className="page-main">
+        <div className="page-header">
+          <h1>Activity Search</h1>
+          <p>Find things to do and add them directly to your itinerary.</p>
+        </div>
+        <Suspense fallback={<div className="spinner" style={{ margin: "40px auto" }} />}>
+          <ActivitySearch />
+        </Suspense>
+      </main>
+    </ProtectedRoute>
   );
 }

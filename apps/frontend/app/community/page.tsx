@@ -6,8 +6,10 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { CommunityPostCard } from "@/components/ui/CommunityPostCard";
 import { getCommunityTrips, likeCommunityTrip, unlikeCommunityTrip, ApiCommunityTrip } from "@/features/community/api/communityApi";
 import { CommunityPost } from "@/data/data";
+import { useAuthGuard } from "@/lib/auth/useAuthGuard";
 
 export default function CommunityPage() {
+  useAuthGuard();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());

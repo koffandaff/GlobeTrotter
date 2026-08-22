@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { ProfileView } from "@/features/profile/components/ProfileView";
+import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 
 export const metadata: Metadata = {
   title: "Profile & Settings",
@@ -9,10 +10,12 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
   return (
-    <main className="page-main">
-      <Suspense fallback={<div className="spinner" style={{ margin: "40px auto" }} />}>
-        <ProfileView />
-      </Suspense>
-    </main>
+    <ProtectedRoute>
+      <main className="page-main">
+        <Suspense fallback={<div className="spinner" style={{ margin: "40px auto" }} />}>
+          <ProfileView />
+        </Suspense>
+      </main>
+    </ProtectedRoute>
   );
 }

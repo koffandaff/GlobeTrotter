@@ -16,6 +16,7 @@ export interface CalendarTrip {
   description?: string | null;
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD
+  status?: "DRAFT" | "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
   colorTheme?: "teal" | "gold" | "rust" | "forest" | "sage";
   cityName?: string;
   activities?: CalendarActivity[];

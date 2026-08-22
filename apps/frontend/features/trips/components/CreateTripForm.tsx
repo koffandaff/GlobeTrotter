@@ -85,8 +85,8 @@ export function CreateTripForm() {
         coverImageUrl: formData.coverImageUrl?.trim() || undefined,
       };
 
-      await createTrip(payload);
-      router.push("/my-trips");
+      const newTrip = await createTrip(payload);
+      router.push(`/itinerary-builder?tripId=${newTrip.id}`);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Failed to create trip. Please try again.");
     } finally {

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { fetchApi } from "@/lib/api/client";
+import { apiClient } from "@/lib/api/client";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -62,7 +62,7 @@ export function LoginForm() {
 
     try {
       setIsSubmitting(true);
-      const res = await fetchApi<{
+      const res = await apiClient<{
         user: { id: string; email: string; firstName: string; lastName: string; role: string };
         tokens: { accessToken: string; refreshToken?: string };
       }>("/auth/login", {
@@ -70,9 +70,9 @@ export function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (res.data && res.data.tokens) {
-        login(res.data.tokens.accessToken, res.data.user);
-        if (res.data.user.role === "ADMIN") {
+      if (res && res.tokens) {
+        login(res.tokens.accessToken, res.user);
+        if (res.user.role === "ADMIN") {
           router.push("/admin");
         } else {
           router.push("/dashboard");
