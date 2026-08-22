@@ -18,6 +18,8 @@ const router = Router();
 // --- Personal Profile Routes (Authenticated Only) ---
 router.use(authenticate);
 
+router.get("/me", usersController.getMe);
+
 router.patch(
   "/me",
   uploadAvatar.single("avatar"),

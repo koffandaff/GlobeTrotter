@@ -67,9 +67,15 @@ async function removeSavedDestination(req: Request, res: Response): Promise<void
   ok(res, null);
 }
 
+async function getMe(req: Request, res: Response): Promise<void> {
+  const data = await usersService.getUser(req.user!.id);
+  ok(res, data);
+}
+
 export const usersController = {
   listUsers,
   getUser,
+  getMe,
   updateUserRole,
   updateUserStatus,
   updateMe,

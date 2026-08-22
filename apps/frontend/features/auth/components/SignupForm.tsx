@@ -13,16 +13,38 @@ export function SignupForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const validateName = (name: string) => name.trim().length > 0;
+  const validateEmail = (emailStr: string) => emailStr.includes("@") && emailStr.includes(".");
+  const validatePassword = (pass: string) => pass.length >= 6;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
+    setErrors({});
 
-    if (!firstName || !lastName || !email || !password) {
-      setSubmitError("Please fill out all fields.");
+    const newErrors: Record<string, string> = {};
+
+    if (!validateName(firstName)) {
+      newErrors.firstName = "First name is required.";
+    }
+    if (!validateName(lastName)) {
+      newErrors.lastName = "Last name is required.";
+    }
+    if (!validateEmail(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    if (!validatePassword(password)) {
+      newErrors.password = "Password must be at least 6 characters long.";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
 
@@ -57,34 +79,36 @@ export function SignupForm() {
   }
 
   return (
-    <div style={{ maxWidth: "420px", margin: "0 auto" }}>
+    <div style={{ maxWidth: "520px", margin: "0 auto" }}>
       <div className="page-header" style={{ textAlign: "center" }}>
-        <div className="eyebrow">Join Us</div>
-        <h1>Sign up</h1>
-        <p>Create your account to start planning your next adventure.</p>
+        <div className="eyebrow">Join GlobeTrotter</div>
+        <h1>Create your account</h1>
+        <p>Start planning trips, tracking budgets, and sharing itineraries.</p>
       </div>
 
       <form className="card" onSubmit={handleSubmit}>
-        <div style={{ display: "flex", gap: "16px" }}>
-          <div className="field" style={{ flex: 1 }}>
+        <div className="field-row">
+          <div className="field">
             <label htmlFor="firstName">First name</label>
             <input
               id="firstName"
               type="text"
-              placeholder="Jane"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              style={errors.firstName ? { borderColor: "var(--color-danger)" } : {}}
             />
+            {errors.firstName && <span className="field-error">{errors.firstName}</span>}
           </div>
-          <div className="field" style={{ flex: 1 }}>
+          <div className="field">
             <label htmlFor="lastName">Last name</label>
             <input
               id="lastName"
               type="text"
-              placeholder="Doe"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
+              style={errors.lastName ? { borderColor: "var(--color-danger)" } : {}}
             />
+            {errors.lastName && <span className="field-error">{errors.lastName}</span>}
           </div>
         </div>
 
@@ -96,7 +120,9 @@ export function SignupForm() {
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            style={errors.email ? { borderColor: "var(--color-danger)" } : {}}
           />
+          {errors.email && <span className="field-error">{errors.email}</span>}
         </div>
 
         <div className="field">
@@ -104,10 +130,11 @@ export function SignupForm() {
           <input
             id="signupPassword"
             type="password"
-            placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            style={errors.password ? { borderColor: "var(--color-danger)" } : {}}
           />
+          {errors.password && <span className="field-error">{errors.password}</span>}
         </div>
 
         {submitError && (
@@ -117,7 +144,7 @@ export function SignupForm() {
         )}
 
         <button className="btn btn-primary btn-block" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account..." : "Sign up"}
+          {isSubmitting ? "Creating account..." : "Create account"}
         </button>
       </form>
 

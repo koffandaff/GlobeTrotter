@@ -2,13 +2,24 @@ import { SignupForm } from "@/features/auth/components/SignupForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign up",
+  title: "Sign Up",
+  description: "Create your GlobeTrotter account",
 };
 
 export default function SignupPage() {
   return (
-    <div style={{ paddingTop: "48px", paddingBottom: "48px" }}>
-      <SignupForm />
-    </div>
+    <>
+      <div className="hero-slideshow" aria-hidden="true">
+        <div className="slide"></div>
+        <div className="slide"></div>
+        <div className="slide"></div>
+        <div className="slide"></div>
+        <div className="wash"></div>
+      </div>
+      
+      <main className="page-main">
+        <SignupForm />
+      </main>
+    </>
   );
 }
