@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { requestIdMiddleware } from "./core/middleware/request-id";
 import { requestLoggerMiddleware } from "./core/logger/request-logger";
 import { errorMiddleware } from "./core/middleware/error.middleware";
@@ -21,6 +22,7 @@ const app = express();
 
 app.set("trust proxy", 1);
 
+app.use(cors({ origin: true, credentials: true }));
 app.use(requestIdMiddleware);
 app.use(requestLoggerMiddleware);
 app.use(express.json({ limit: "16mb" }));
