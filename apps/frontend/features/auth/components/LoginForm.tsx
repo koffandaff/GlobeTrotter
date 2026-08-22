@@ -33,7 +33,7 @@ export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Check for saved avatar on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const avatar = localStorage.getItem("userAvatar");
     if (avatar) {
       setSavedAvatar(avatar);
@@ -47,6 +47,7 @@ export function LoginForm() {
     setSubmitError("");
     let isValid = true;
 
+    // Validate email
     if (!emailRegex.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       isValid = false;
@@ -61,14 +62,21 @@ export function LoginForm() {
 
     try {
       setIsSubmitting(true);
-      const res = await fetchApi("/auth/login", {
+      const res = await fetchApi<{
+        user: { id: string; email: string; firstName: string; lastName: string; role: string };
+        tokens: { accessToken: string; refreshToken?: string };
+      }>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
-      
+
       if (res.data && res.data.tokens) {
         login(res.data.tokens.accessToken, res.data.user);
-        router.push("/");
+        if (res.data.user.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -89,10 +97,10 @@ export function LoginForm() {
         <p>Access your trips, budgets, and saved plans.</p>
       </div>
 
-      {email.includes("@") && (
+      {email.includes("@") && savedAvatar && (
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
           <img
-            src={savedAvatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(email)}`}
+            src={savedAvatar}
             alt="User avatar"
             style={{
               width: "96px",
@@ -100,7 +108,7 @@ export function LoginForm() {
               borderRadius: "50%",
               objectFit: "cover",
               border: "2px solid var(--color-border)",
-              boxShadow: "var(--shadow-sm)"
+              boxShadow: "var(--shadow-sm)",
             }}
           />
         </div>

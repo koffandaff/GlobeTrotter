@@ -33,7 +33,6 @@ export function Navigation() {
     { href: "/budget", label: "Budget" },
     { href: "/community", label: "Community" },
     { href: "/calendar", label: "Calendar" },
-    { href: "/admin", label: "Admin" },
   ];
 
   return (
@@ -107,24 +106,6 @@ export function Navigation() {
           );
         })}
 
-        <div
-          style={{
-            marginTop: "auto",
-            paddingTop: "16px",
-            borderTop: "1px solid var(--color-border)",
-          }}
-        >
-          <Link href="/login" className={pathname === "/login" ? "active" : ""} onClick={closeNav}>
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className={pathname === "/signup" ? "active" : ""}
-            onClick={closeNav}
-          >
-            Sign up
-          </Link>
-        </div>
       </nav>
     </>
   );
