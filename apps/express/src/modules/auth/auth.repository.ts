@@ -44,6 +44,10 @@ export async function registerInvitedUser(input: {
   passwordHash: string;
   otpHash?: string | null;
   otpExpiresAt?: Date | null;
+  phone?: string | null;
+  city?: string | null;
+  country?: string | null;
+  additionalInfo?: string | null;
 }): Promise<UserRecord> {
   try {
     return await prisma.$transaction(async (tx) => {
@@ -53,8 +57,18 @@ export async function registerInvitedUser(input: {
           lastName: input.lastName,
           displayName: input.displayName ?? null,
           email: input.email,
+          phone: input.phone ?? null,
           role: input.role,
           passwordHash: input.passwordHash,
+          preference: {
+            create: {
+              preferredCurrency: "USD",
+              language: "en",
+              city: input.city ?? null,
+              homeCountry: input.country ?? null,
+              additionalInfo: input.additionalInfo ?? null,
+            },
+          },
         },
         select: userSelect,
       });

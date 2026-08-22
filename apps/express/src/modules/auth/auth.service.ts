@@ -195,6 +195,10 @@ export async function register(input: RegisterRequest): Promise<AuthUserDto> {
     email: input.email,
     role: "USER",
     passwordHash: await hashPassword(input.password),
+    phone: input.phone,
+    city: input.city,
+    country: input.country,
+    additionalInfo: input.additionalInfo,
   });
 
   logger.info("user registered", { userId: user.id, role: user.role });
