@@ -48,13 +48,12 @@ function toBudgetCategoryDto(cat: CategoryBudgetRaw): BudgetCategoryDto {
 }
 
 export async function getDashboard(userId: string): Promise<DashboardResponseDto> {
-  const [recentTrips, recommendedDestinations, budgetAggregates, categoryBreakdown, budgetCounts] = await Promise.all([
-    dashboardRepository.findRecentTrips(userId, 5),
-    dashboardRepository.findRecommendedDestinations(userId, 6),
-    dashboardRepository.getBudgetAggregates(userId),
-    dashboardRepository.getCategoryBudgetBreakdown(userId),
-    dashboardRepository.getTripBudgetCounts(userId),
-  ]);
+  // Run sequentially to avoid exhausting the connection pool on free-tier Postgres
+  const recentTrips = await dashboardRepository.findRecentTrips(userId, 5);
+  const recommendedDestinations = await dashboardRepository.findRecommendedDestinations(userId, 6);
+  const budgetAggregates = await dashboardRepository.getBudgetAggregates(userId);
+  const categoryBreakdown = await dashboardRepository.getCategoryBudgetBreakdown(userId);
+  const budgetCounts = await dashboardRepository.getTripBudgetCounts(userId);
 
   const budgetHighlights: BudgetHighlightsDto = {
     totalBudget: budgetAggregates.totalBudget ? Number(budgetAggregates.totalBudget) : null,

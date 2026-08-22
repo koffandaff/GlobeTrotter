@@ -125,6 +125,11 @@ export async function getBudgetAggregates(userId: string): Promise<BudgetAggrega
       currency: true,
       budget: { select: { totalBudget: true } },
       expenses: { select: { amount: true, isEstimated: true } },
+      stops: {
+        select: {
+          itineraryItems: { select: { estimatedCost: true } }
+        }
+      }
     },
   });
 
@@ -142,6 +147,13 @@ export async function getBudgetAggregates(userId: string): Promise<BudgetAggrega
         totalEstimated = totalEstimated.plus(exp.amount);
       } else {
         totalSpent = totalSpent.plus(exp.amount);
+      }
+    }
+    for (const stop of trip.stops) {
+      for (const item of stop.itineraryItems) {
+        if (item.estimatedCost) {
+          totalEstimated = totalEstimated.plus(item.estimatedCost);
+        }
       }
     }
   }
@@ -169,6 +181,16 @@ export async function getCategoryBudgetBreakdown(userId: string): Promise<Catego
           isEstimated: true,
         },
       },
+      stops: {
+        select: {
+          itineraryItems: {
+            select: {
+              estimatedCost: true,
+              activity: { select: { category: true } }
+            }
+          }
+        }
+      }
     },
   });
 
@@ -218,6 +240,32 @@ export async function getCategoryBudgetBreakdown(userId: string): Promise<Catego
         }
       }
     }
+
+    for (const stop of trip.stops) {
+      for (const item of stop.itineraryItems) {
+        if (item.estimatedCost) {
+          let cat = "ACTIVITY";
+          if (item.activity?.category) {
+            const c = item.activity.category.toUpperCase();
+            if (categories.includes(c as any)) {
+              cat = c;
+            } else if (c.includes("FOOD") || c.includes("DINING") || c.includes("RESTAURANT") || c.includes("EAT")) {
+              cat = "FOOD";
+            } else if (c.includes("TRANSPORT") || c.includes("FLIGHT") || c.includes("TRAIN") || c.includes("BUS")) {
+              cat = "TRANSPORT";
+            } else if (c.includes("ACCOMMODATION") || c.includes("HOTEL") || c.includes("STAY")) {
+              cat = "ACCOMMODATION";
+            } else {
+              cat = "OTHER";
+            }
+          }
+          const entry = map.get(cat);
+          if (entry) {
+            entry.estimated = entry.estimated.plus(item.estimatedCost);
+          }
+        }
+      }
+    }
   }
 
   return categories.map((category) => ({
@@ -229,14 +277,15 @@ export async function getCategoryBudgetBreakdown(userId: string): Promise<Catego
 }
 
 export async function getTripBudgetCounts(userId: string): Promise<TripBudgetCounts> {
-  const [allTrips, withBudget] = await Promise.all([
-    prisma.trip.count({
-      where: { userId, deletedAt: null },
-    }),
-    prisma.tripBudget.count({
-      where: { trip: { userId, deletedAt: null } },
-    }),
-  ]);
+  const allTrips = await prisma.trip.count({
+    where: { userId, deletedAt: null },
+  });
+  const withBudget = await prisma.tripBudget.count({
+    where: { trip: { userId, deletedAt: null } },
+  });
+  return { tripsWithBudget: withBudget, tripsWithoutBudget: Math.max(0, allTrips - withBudget) };
+}
+
 
   return { tripsWithBudget: withBudget, tripsWithoutBudget: Math.max(0, allTrips - withBudget) };
 }

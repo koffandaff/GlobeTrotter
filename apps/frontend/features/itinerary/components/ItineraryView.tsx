@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useItinerary } from "../hooks/useItinerary";
 
 interface ItineraryViewProps {
@@ -9,8 +10,12 @@ interface ItineraryViewProps {
 }
 
 export function ItineraryView({ initialTripId }: ItineraryViewProps) {
+  const searchParams = useSearchParams();
+  const urlTripId = searchParams.get("tripId");
+  const actualTripId = initialTripId || urlTripId || undefined;
+
   const { tripId, setTripId, availableTrips, itinerary, isLoading, error } =
-    useItinerary(initialTripId);
+    useItinerary(actualTripId);
 
   const [search, setSearch] = useState("");
   const [groupBy, setGroupBy] = useState<"DAY" | "CITY">("DAY");
@@ -130,6 +135,11 @@ export function ItineraryView({ initialTripId }: ItineraryViewProps) {
               cursor: "pointer",
             }}
           >
+            {tripId && !availableTrips.some(t => t.id === tripId) && (
+              <option value={tripId}>
+                {itinerary?.trip.name || "Community Trip"}
+              </option>
+            )}
             {availableTrips.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.name}

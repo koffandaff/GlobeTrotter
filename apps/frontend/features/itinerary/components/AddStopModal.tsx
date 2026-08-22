@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import type { AddStopInput } from "../types";
+import { useCities } from "../../cities/hooks/useCities";
 
 interface AddStopModalProps {
   isOpen: boolean;
@@ -9,19 +10,10 @@ interface AddStopModalProps {
   onAddStop: (data: AddStopInput) => Promise<{ success: boolean; error?: string }>;
 }
 
-const PRESET_CITIES = [
-  { id: "city-paris", name: "Paris", country: "France" },
-  { id: "city-nice", name: "Nice", country: "France" },
-  { id: "city-rome", name: "Rome", country: "Italy" },
-  { id: "city-tokyo", name: "Tokyo", country: "Japan" },
-  { id: "city-kyoto", name: "Kyoto", country: "Japan" },
-  { id: "city-nyc", name: "New York", country: "USA" },
-  { id: "city-barcelona", name: "Barcelona", country: "Spain" },
-  { id: "city-london", name: "London", country: "UK" },
-];
-
 export function AddStopModal({ isOpen, onClose, onAddStop }: AddStopModalProps) {
-  const [cityId, setCityId] = useState(PRESET_CITIES[0].id);
+  const { cities, search, setSearch, isLoading: isCitiesLoading } = useCities();
+  
+  const [cityId, setCityId] = useState("");
   const [customCityName, setCustomCityName] = useState("");
   const [arrivalDate, setArrivalDate] = useState("");
   const [departureDate, setDepartureDate] = useState("");
@@ -34,11 +26,25 @@ export function AddStopModal({ isOpen, onClose, onAddStop }: AddStopModalProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Basic date validation
+    if (arrivalDate && departureDate) {
+      if (new Date(departureDate) < new Date(arrivalDate)) {
+        setError("Departure date cannot be before arrival date.");
+        return;
+      }
+    }
+
+    if (!cityId) {
+      setError("Please select a destination city.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const res = await onAddStop({
-      cityId: cityId || "custom-city",
-      cityName: customCityName || PRESET_CITIES.find((c) => c.id === cityId)?.name,
+      cityId: cityId,
+      cityName: cities.find((c) => c.id === cityId)?.name || customCityName,
       arrivalDate: arrivalDate || undefined,
       departureDate: departureDate || undefined,
       notes: notes.trim() || undefined,
@@ -133,13 +139,18 @@ export function AddStopModal({ isOpen, onClose, onAddStop }: AddStopModalProps) 
 
         <form onSubmit={handleSubmit}>
           <div className="field" style={{ marginBottom: "16px" }}>
-            <label htmlFor="citySelect" style={{ fontWeight: 600, display: "block", marginBottom: "6px" }}>
-              Select Destination City
+            <label htmlFor="citySearch" style={{ fontWeight: 600, display: "block", marginBottom: "6px" }}>
+              Search Destination
             </label>
-            <select
-              id="citySelect"
-              value={cityId}
-              onChange={(e) => setCityId(e.target.value)}
+            <input
+              id="citySearch"
+              type="text"
+              placeholder="Search worldwide cities via OpenStreetMap..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCityId("");
+              }}
               style={{
                 width: "100%",
                 padding: "10px 14px",
@@ -147,14 +158,34 @@ export function AddStopModal({ isOpen, onClose, onAddStop }: AddStopModalProps) 
                 border: "1px solid var(--color-border)",
                 background: "#ffffff",
                 fontSize: "0.92rem",
+                marginBottom: "8px",
               }}
-            >
-              {PRESET_CITIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}, {c.country}
-                </option>
-              ))}
-            </select>
+            />
+            {isCitiesLoading ? (
+              <span style={{ fontSize: "0.85rem", color: "var(--color-text-muted)" }}>Searching...</span>
+            ) : cities.length > 0 ? (
+              <select
+                value={cityId}
+                onChange={(e) => setCityId(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid var(--color-border)",
+                  background: "#ffffff",
+                  fontSize: "0.92rem",
+                }}
+              >
+                <option value="" disabled>Select a matched city</option>
+                {cities.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}, {c.country}
+                  </option>
+                ))}
+              </select>
+            ) : search.length > 1 ? (
+              <span style={{ fontSize: "0.85rem", color: "var(--color-text-muted)" }}>No cities found.</span>
+            ) : null}
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "16px" }}>
@@ -165,6 +196,7 @@ export function AddStopModal({ isOpen, onClose, onAddStop }: AddStopModalProps) 
               <input
                 id="arrivalDate"
                 type="date"
+                min={new Date().toISOString().split("T")[0]}
                 value={arrivalDate}
                 onChange={(e) => setArrivalDate(e.target.value)}
                 style={{
@@ -184,6 +216,7 @@ export function AddStopModal({ isOpen, onClose, onAddStop }: AddStopModalProps) 
               <input
                 id="departureDate"
                 type="date"
+                min={arrivalDate || new Date().toISOString().split("T")[0]}
                 value={departureDate}
                 onChange={(e) => setDepartureDate(e.target.value)}
                 style={{
