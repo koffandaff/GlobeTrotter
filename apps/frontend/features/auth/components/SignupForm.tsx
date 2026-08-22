@@ -1,13 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { fetchApi } from "@/lib/api/client";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
+import { useAuth } from "@/lib/auth/AuthContext";
+
 export function SignupForm() {
   const router = useRouter();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      if (user.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, isAuthenticated, isLoading, router]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

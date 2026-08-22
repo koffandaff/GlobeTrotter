@@ -1,18 +1,29 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import Link from "next/link";
-import { currentUser, trips, popularCities } from "@/data/data";
+import { useRouter } from "next/navigation";
+import { trips, popularCities } from "@/data/data";
 import { StatCard } from "@/components/ui/StatCard";
 import { TripCard } from "@/components/ui/TripCard";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { CityTile } from "@/components/ui/CityTile";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Your GlobeTrotter travel overview",
-};
+import { useAuth } from "@/lib/auth/AuthContext";
 
 export default function DashboardPage() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading || !user) {
+    return <div style={{ padding: "40px", textAlign: "center" }}>Loading dashboard...</div>;
+  }
+
   const upcomingCount = trips.filter((t) => t.status === "upcoming").length;
   const completedCount = trips.filter((t) => t.status === "completed").length;
   const totalBudget = trips.reduce((acc, trip) => acc + (trip.budget || 0), 0);
@@ -21,7 +32,7 @@ export default function DashboardPage() {
     <main className="page-main">
       <div className="page-header">
         <div className="eyebrow">Overview</div>
-        <h1>Where to next, {currentUser.firstName}?</h1>
+        <h1>Where to next, {user.firstName}?</h1>
         <p>Here is a quick summary of your travel plans and budgets.</p>
       </div>
 
