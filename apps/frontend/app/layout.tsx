@@ -26,9 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div className="app-shell">
           <Navigation />
           {children}
-          <footer className="site-footer">
-            GlobeTrotter — Hackathon Prototype · Static demo, no data is saved
-          </footer>
+          <footer className="site-footer">GlobeTrotter — Hackathon</footer>
         </div>
       </body>
     </html>

@@ -4,8 +4,8 @@
 
 :root {
   --color-bg: #f7f2e6;
-  --color-surface: #f5f9f6; /* soft green-white, not stark white */
-  --color-surface-alt: #eff6f1;
+  --color-surface: #e9ecd8; /* soft olive green */
+  --color-surface-alt: #e0e5c9;
   --color-border: #dce8df;
   --color-text: #24352e;
   --color-text-muted: #66766c;
@@ -751,3 +751,6 @@ textarea:focus-visible {
   margin-top: 4px;
   font-weight: 500;
 }
+
+.char-counter { font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-top: 4px; text-align: right; }
+
