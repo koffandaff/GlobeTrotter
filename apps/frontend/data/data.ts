@@ -86,3 +86,65 @@ export const activities: ActivityOption[] = [
   { id: "a1", cityId: "c1", name: "Tsukiji Outer Market", category: "Food", priceLevel: 2 },
   { id: "a2", cityId: "c2", name: "Eiffel Tower Tour", category: "Sightseeing", priceLevel: 3 },
 ];
+
+export interface TripSuggestion {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export const tripSuggestions: TripSuggestion[] = [
+  {
+    id: "s1",
+    name: "Kyoto, Japan",
+    description: "Experience ancient temples and beautiful gardens.",
+  },
+  {
+    id: "s2",
+    name: "Santorini, Greece",
+    description: "Relax by the stunning blue-domed churches and ocean views.",
+  },
+  {
+    id: "s3",
+    name: "Banff, Canada",
+    description: "Explore majestic mountains and turquoise glacial lakes.",
+  },
+];
+
+export interface Activity {
+  id: string;
+  name: string;
+  type: string; // e.g. "Sightseeing", "Food", "Adventure"
+  duration?: string; // e.g. "2 hours"
+  cost?: number;
+}
+
+export interface ItineraryStop {
+  id: string;
+  city: string;
+  startDate: string; // ISO date string
+  endDate: string;
+  activities: Activity[];
+}
+
+export const itineraryStops: ItineraryStop[] = [
+  {
+    id: "stop1",
+    city: "Miami, USA",
+    startDate: "2024-11-02",
+    endDate: "2024-11-05",
+    activities: [
+      { id: "act1", name: "South Beach Walk", type: "Sightseeing", duration: "2 hours" },
+      { id: "act2", name: "Cuban Dinner at Versailles", type: "Food", cost: 45 },
+    ],
+  },
+  {
+    id: "stop2",
+    city: "Key West, USA",
+    startDate: "2024-11-05",
+    endDate: "2024-11-09",
+    activities: [
+      { id: "act3", name: "Snorkeling Tour", type: "Adventure", duration: "4 hours", cost: 120 },
+    ],
+  },
+];
