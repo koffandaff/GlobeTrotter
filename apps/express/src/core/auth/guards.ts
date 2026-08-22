@@ -42,3 +42,18 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
     next(error);
   }
 };
+
+import { AuthorizationError } from "../errors/app-error";
+
+export const requireRole = (requiredRole: string): RequestHandler => {
+  return (req, _res, next) => {
+    if (!req.user) {
+      return next(new AuthenticationError("Not authenticated"));
+    }
+    if (req.user.role !== requiredRole) {
+      return next(new AuthorizationError("Forbidden"));
+    }
+    next();
+  };
+};
+
