@@ -16,8 +16,8 @@
   --color-gold-soft: #fbeed9;
   --color-danger: #b5533c;
 
-  --font-display: "Fraunces", "Georgia", serif;
-  --font-body: "Work Sans", "Segoe UI", sans-serif;
+  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   --radius-sm: 6px;
   --radius-md: 12px;
