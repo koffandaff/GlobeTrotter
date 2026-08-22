@@ -1,5 +1,4 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-
 export const API_URL = API_BASE_URL;
 
 export interface ApiResponse<T> {
@@ -33,7 +32,7 @@ export async function apiClient<T>(
       ? localStorage.getItem("accessToken") || localStorage.getItem("token")
       : null);
 
-  // Prevent sending literal strings "undefined" or "null" which causes 401s
+  // PREVENT SENDING "undefined" OR "null" STRINGS
   if (token && token !== "undefined" && token !== "null") {
     headers["Authorization"] = `Bearer ${token}`;
   }
@@ -54,7 +53,7 @@ export async function apiClient<T>(
   return (json.data !== undefined ? json.data : json) as T;
 }
 
-// Keep fetchApi around for backwards compatibility with our auth components
+// Keep fetchApi around for backwards compatibility with our Auth components
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   
@@ -63,6 +62,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     ...(options.headers as Record<string, string>),
   };
 
+  // PREVENT SENDING "undefined" OR "null" STRINGS
   if (token && token !== "undefined" && token !== "null") {
     headers["Authorization"] = `Bearer ${token}`;
   }
