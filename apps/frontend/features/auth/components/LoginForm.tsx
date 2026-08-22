@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { fetchApi } from "@/lib/api/client";
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function LoginForm() {
   const router = useRouter();
   const { login, user, isAuthenticated, isLoading } = useAuth();
@@ -23,20 +25,37 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+<<<<<<< HEAD
+  // Check for saved avatar on mount
+  React.useEffect(() => {
+    const avatar = localStorage.getItem("userAvatar");
+    if (avatar) {
+      setSavedAvatar(avatar);
+    }
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+=======
   const handleSubmit = async (e: React.FormEvent) => {
+>>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     e.preventDefault();
     setEmailError("");
     setPasswordError("");
     setSubmitError("");
     let isValid = true;
 
+<<<<<<< HEAD
+    // Validate email
+=======
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+>>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     if (!emailRegex.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       isValid = false;
@@ -78,6 +97,23 @@ export function LoginForm() {
         <h1>Log in</h1>
         <p>Access your trips, budgets, and saved plans.</p>
       </div>
+
+      {email.includes("@") && (
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
+          <img
+            src={savedAvatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(email)}`}
+            alt="User avatar"
+            style={{
+              width: "96px",
+              height: "96px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "2px solid var(--color-border)",
+              boxShadow: "var(--shadow-sm)"
+            }}
+          />
+        </div>
+      )}
 
       <form className="card" onSubmit={handleSubmit}>
         <div className="field">

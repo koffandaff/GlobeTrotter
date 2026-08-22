@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { fetchApi } from "@/lib/api/client";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { AvatarUpload } from "@/components/ui/AvatarUpload";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 
@@ -131,6 +132,10 @@ export function SignupForm() {
       </div>
 
       <form className="card" onSubmit={handleSubmit}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
+          <AvatarUpload initials={(firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || "?"} />
+        </div>
+
         <div className="field-row">
           <div className="field">
             <label htmlFor="firstName">First name</label>
