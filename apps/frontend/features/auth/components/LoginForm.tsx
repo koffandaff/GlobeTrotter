@@ -33,7 +33,7 @@ export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Check for saved avatar on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const avatar = localStorage.getItem("userAvatar");
     if (avatar) {
       setSavedAvatar(avatar);
@@ -62,14 +62,21 @@ export function LoginForm() {
 
     try {
       setIsSubmitting(true);
-      const res = await fetchApi("/auth/login", {
+      const res = await fetchApi<{
+        user: { id: string; email: string; firstName: string; lastName: string; role: string };
+        tokens: { accessToken: string; refreshToken?: string };
+      }>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
-      
+
       if (res.data && res.data.tokens) {
         login(res.data.tokens.accessToken, res.data.user);
-        router.push("/");
+        if (res.data.user.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -101,7 +108,7 @@ export function LoginForm() {
               borderRadius: "50%",
               objectFit: "cover",
               border: "2px solid var(--color-border)",
-              boxShadow: "var(--shadow-sm)"
+              boxShadow: "var(--shadow-sm)",
             }}
           />
         </div>

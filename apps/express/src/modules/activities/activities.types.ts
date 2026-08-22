@@ -1,6 +1,7 @@
 export interface ActivitySearchQuery {
-  cityId: string;
+  cityId?: string;
   category?: string;
+  search?: string;
   maxCost?: number;
   maxDuration?: number;
   page?: number;

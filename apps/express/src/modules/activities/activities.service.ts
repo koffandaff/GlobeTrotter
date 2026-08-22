@@ -62,7 +62,7 @@ export async function searchActivities(query: ActivitySearchQuery): Promise<Acti
   const { page, limit } = parsePagination(query);
   const { activities, totalItems } = await activitiesRepository.findActivitiesByCity(
     query.cityId,
-    { category: query.category, maxCost: query.maxCost, maxDuration: query.maxDuration },
+    { category: query.category, maxCost: query.maxCost, maxDuration: query.maxDuration, search: query.search },
     { page, limit }
   );
 

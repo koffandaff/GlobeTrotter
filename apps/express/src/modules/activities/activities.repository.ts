@@ -49,19 +49,26 @@ interface ActivityDetailResult {
 }
 
 export async function findActivitiesByCity(
-  cityId: string,
+  cityId: string | undefined,
   filters: {
     category?: string;
     maxCost?: number;
     maxDuration?: number;
+    search?: string;
   },
   pagination: { page: number; limit: number }
 ): Promise<{ activities: ActivitySearchResult[]; totalItems: number }> {
   const where: Prisma.ActivityWhereInput = {
-    cityId,
+    ...(cityId && { cityId }),
     ...(filters.category && { category: { contains: filters.category, mode: "insensitive" } }),
     ...(filters.maxCost !== undefined && { estimatedCost: { lte: filters.maxCost } }),
     ...(filters.maxDuration !== undefined && { durationMinutes: { lte: filters.maxDuration } }),
+    ...(filters.search && {
+      OR: [
+        { name: { contains: filters.search, mode: "insensitive" } },
+        { description: { contains: filters.search, mode: "insensitive" } },
+      ],
+    }),
   };
 
   const [activities, totalItems] = await Promise.all([
