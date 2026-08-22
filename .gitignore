@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# builds
+dist/
+.next/
+out/
+
+# env files (examples are committed, real files never)
+.env
+.env.local
+.env.*.local
+
+# generated prisma client
+apps/express/generated/
+
+# logs
+*.log
+npm-debug.log*
+
+# misc
+.DS_Store
+Thumbs.db
+.vercel
+tsconfig.tsbuildinfo
+
+# next.js generated agent docs
+AGENTS.md
+CLAUDE.md

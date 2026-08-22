@@ -1,0 +1,20 @@
+{
+  "name": "virtualround-hackathon",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev --prefix apps/express\" \"npm run dev --prefix apps/frontend\"",
+    "dev:backend": "npm run dev --prefix apps/express",
+    "dev:frontend": "npm run dev --prefix apps/frontend",
+    "build": "npm run build --prefix apps/express && npm run build --prefix apps/frontend",
+    "install:all": "npm install --prefix apps/express && npm install --prefix apps/frontend",
+    "lint": "npm run lint --prefix apps/express && npm run lint --prefix apps/frontend",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --prefix apps/express && npm run typecheck --prefix apps/frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "prettier": "^3.6.2"
+  }
+}
