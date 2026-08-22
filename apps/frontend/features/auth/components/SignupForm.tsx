@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { fetchApi } from "@/lib/api/client";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export function SignupForm() {
   const router = useRouter();
@@ -12,14 +13,35 @@ export function SignupForm() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const validateName = (name: string) => name.trim().length > 0;
-  const validateEmail = (emailStr: string) => emailStr.includes("@") && emailStr.includes(".");
+  const MAX_CHARS = 300;
+
+  const handleInfoChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    if (text.length <= MAX_CHARS) {
+      setAdditionalInfo(text);
+    }
+  };
+
+  const validateName = (name: string) => /^[a-zA-Z\s\-']+$/.test(name.trim()) && name.trim().length > 0;
+  const validateLocation = (loc: string) => /^[a-zA-Z\s\-',\.]+$/.test(loc.trim()) && loc.trim().length > 0;
+  const validateEmail = (emailStr: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailStr.trim());
+  const validatePhone = (phoneStr: string) => {
+    try {
+      return isValidPhoneNumber(phoneStr);
+    } catch {
+      return false;
+    }
+  };
   const validatePassword = (pass: string) => pass.length >= 6;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,16 +52,25 @@ export function SignupForm() {
     const newErrors: Record<string, string> = {};
 
     if (!validateName(firstName)) {
-      newErrors.firstName = "First name is required.";
+      newErrors.firstName = "Please enter a valid first name (letters only).";
     }
     if (!validateName(lastName)) {
-      newErrors.lastName = "Last name is required.";
+      newErrors.lastName = "Please enter a valid last name (letters only).";
     }
     if (!validateEmail(email)) {
       newErrors.email = "Please enter a valid email address.";
     }
+    if (!validatePhone(phone)) {
+      newErrors.phone = "Invalid phone number format for the provided country code.";
+    }
     if (!validatePassword(password)) {
       newErrors.password = "Password must be at least 6 characters long.";
+    }
+    if (!validateLocation(city)) {
+      newErrors.city = "Please enter a valid city name.";
+    }
+    if (!validateLocation(country)) {
+      newErrors.country = "Please enter a valid country name.";
     }
 
     setErrors(newErrors);
@@ -52,7 +83,7 @@ export function SignupForm() {
       setIsSubmitting(true);
       await fetchApi("/auth/register", {
         method: "POST",
-        body: JSON.stringify({ firstName, lastName, email, password }),
+        body: JSON.stringify({ firstName, lastName, email, password, phone, city, country, additionalInfo }),
       });
       setSuccess(true);
       setTimeout(() => {
@@ -125,16 +156,67 @@ export function SignupForm() {
           {errors.email && <span className="field-error">{errors.email}</span>}
         </div>
 
+        <div className="field-row">
+          <div className="field">
+            <label htmlFor="phone">Phone number</label>
+            <input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              style={errors.phone ? { borderColor: "var(--color-danger)" } : {}}
+            />
+            {errors.phone && <span className="field-error">{errors.phone}</span>}
+          </div>
+          <div className="field">
+            <label htmlFor="signupPassword">Password</label>
+            <input
+              id="signupPassword"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={errors.password ? { borderColor: "var(--color-danger)" } : {}}
+            />
+            {errors.password && <span className="field-error">{errors.password}</span>}
+          </div>
+        </div>
+
+        <div className="field-row">
+          <div className="field">
+            <label htmlFor="city">City</label>
+            <input
+              id="city"
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              style={errors.city ? { borderColor: "var(--color-danger)" } : {}}
+            />
+            {errors.city && <span className="field-error">{errors.city}</span>}
+          </div>
+          <div className="field">
+            <label htmlFor="country">Country</label>
+            <input
+              id="country"
+              type="text"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              style={errors.country ? { borderColor: "var(--color-danger)" } : {}}
+            />
+            {errors.country && <span className="field-error">{errors.country}</span>}
+          </div>
+        </div>
+
         <div className="field">
-          <label htmlFor="signupPassword">Password</label>
-          <input
-            id="signupPassword"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={errors.password ? { borderColor: "var(--color-danger)" } : {}}
-          />
-          {errors.password && <span className="field-error">{errors.password}</span>}
+          <label htmlFor="additionalInfo">Additional information (optional)</label>
+          <textarea
+            id="additionalInfo"
+            placeholder="Travel interests, preferences..."
+            value={additionalInfo}
+            onChange={handleInfoChange}
+          ></textarea>
+          <span className="char-counter">
+            {additionalInfo.length} / {MAX_CHARS} characters
+          </span>
         </div>
 
         {submitError && (

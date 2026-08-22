@@ -26,8 +26,9 @@ export function LoginForm() {
     setSubmitError("");
     let isValid = true;
 
-    if (!email.includes("@")) {
-      setEmailError("Please enter a valid email address containing '@'.");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setEmailError("Please enter a valid email address.");
       isValid = false;
     }
 
