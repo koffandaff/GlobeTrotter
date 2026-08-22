@@ -38,6 +38,8 @@ export default function ItineraryBuilderPage() {
       id: `act-${Date.now()}`,
       name: "New activity",
       type: "Sightseeing",
+      day: 1,
+      category: "activities",
     };
     
     setStops((prev) =>
