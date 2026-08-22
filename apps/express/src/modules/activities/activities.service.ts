@@ -29,7 +29,7 @@ function toActivitySummaryDto(activity: Awaited<ReturnType<typeof activitiesRepo
   };
 }
 
-function toActivityDetailDto(activity: Awaited<ReturnType<typeof activitiesRepository.findActivityById>>): ActivityDetailDto {
+function toActivityDetailDto(activity: NonNullable<Awaited<ReturnType<typeof activitiesRepository.findActivityById>>>): ActivityDetailDto {
   return {
     id: activity.id,
     name: activity.name,

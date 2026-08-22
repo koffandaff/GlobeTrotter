@@ -7,6 +7,7 @@ import { API_PREFIX } from "./config/constants";
 import { authRouter } from "./modules/auth";
 import usersRouter from "./modules/users";
 import { dashboardRouter } from "./modules/dashboard";
+import { activitiesRouter } from "./modules/activities";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/health", (_req, res) => {
 app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/users`, usersRouter);
 app.use(`${API_PREFIX}/dashboard`, dashboardRouter);
+app.use(`${API_PREFIX}/activities`, activitiesRouter);
 
 app.use((_req, res) => {
   sendError(res, "Route not found", 404, "ROUTE_NOT_FOUND");

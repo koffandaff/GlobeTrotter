@@ -10,7 +10,7 @@ async function searchActivities(req: Request, res: Response): Promise<void> {
 }
 
 async function getActivityDetail(req: Request, res: Response): Promise<void> {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const data = await activitiesService.getActivityDetail(id);
   ok(res, data);
 }
