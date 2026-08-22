@@ -57,7 +57,7 @@ export function ProfileView() {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       displayName: displayName.trim() || undefined,
-      preferredLanguage: language,
+      language: language,
     });
     setIsSaving(false);
 

@@ -22,5 +22,5 @@ export interface UpdateUserProfileInput {
   lastName?: string;
   displayName?: string;
   avatarUrl?: string;
-  preferredLanguage?: string;
+  language?: string;
 }

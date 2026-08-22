@@ -22,7 +22,8 @@ export const updateUserStatusSchema = z.object({
 export const updateMeSchema = z.object({
   firstName: z.string().trim().min(1, "firstName cannot be empty").max(100).optional(),
   lastName: z.string().trim().min(1, "lastName cannot be empty").max(100).optional(),
-  language: z.string().trim().max(10).optional(),
+  displayName: z.string().trim().max(100).optional(),
+  language: z.string().trim().max(20).optional(),
   // avatarUrl is handled by multer, but we can accept it if sent as string (e.g. they uploaded it elsewhere)
   avatarUrl: z.string().url("avatarUrl must be a valid URL").optional(),
 });

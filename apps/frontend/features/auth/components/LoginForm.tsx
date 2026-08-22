@@ -32,7 +32,6 @@ export function LoginForm() {
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-<<<<<<< HEAD
   // Check for saved avatar on mount
   React.useEffect(() => {
     const avatar = localStorage.getItem("userAvatar");
@@ -41,21 +40,13 @@ export function LoginForm() {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-=======
   const handleSubmit = async (e: React.FormEvent) => {
->>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     e.preventDefault();
     setEmailError("");
     setPasswordError("");
     setSubmitError("");
     let isValid = true;
 
-<<<<<<< HEAD
-    // Validate email
-=======
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
->>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     if (!emailRegex.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       isValid = false;

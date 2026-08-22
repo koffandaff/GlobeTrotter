@@ -75,7 +75,7 @@ export async function updateUserStatus(
   return updated;
 }
 
-export async function updateMe(userId: string, data: { firstName?: string; lastName?: string; avatarUrl?: string; language?: string }) {
+export async function updateMe(userId: string, data: { firstName?: string; lastName?: string; displayName?: string; avatarUrl?: string; language?: string }) {
   const updated = await usersRepository.updateProfile(userId, data);
   if (!updated) {
     throw new NotFoundError("user not found");

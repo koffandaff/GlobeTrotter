@@ -93,12 +93,13 @@ export function updateUserStatus(
 
 export async function updateProfile(
   id: string,
-  data: { firstName?: string; lastName?: string; avatarUrl?: string; language?: string }
+  data: { firstName?: string; lastName?: string; displayName?: string; avatarUrl?: string; language?: string }
 ) {
   return prisma.$transaction(async (tx) => {
     const userUpdate: Prisma.UserUpdateInput = {};
     if (data.firstName !== undefined) userUpdate.firstName = data.firstName;
     if (data.lastName !== undefined) userUpdate.lastName = data.lastName;
+    if (data.displayName !== undefined) userUpdate.displayName = data.displayName;
     if (data.avatarUrl !== undefined) userUpdate.avatarUrl = data.avatarUrl;
 
     if (Object.keys(userUpdate).length > 0) {
