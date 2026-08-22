@@ -15,6 +15,7 @@ import { tripActivitiesRouter } from "./modules/trip-activities";
 import { itineraryViewsRouter } from "./modules/itinerary-views";
 import { citiesRouter } from "./modules/cities";
 import { communityRouter } from "./modules/community";
+import { adminRouter } from "./modules/admin";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(`${API_PREFIX}/stops`, stopsRouter);
 app.use(`${API_PREFIX}`, tripActivitiesRouter);
 app.use(`${API_PREFIX}/community`, communityRouter);
 app.use(`${API_PREFIX}`, itineraryViewsRouter);
+app.use(`${API_PREFIX}/admin`, adminRouter);
 
 app.use((_req, res) => {
   sendError(res, "Route not found", 404, "ROUTE_NOT_FOUND");
