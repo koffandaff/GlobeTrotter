@@ -35,6 +35,8 @@ interface AdminDashboardData {
   error: string | null;
 }
 
+import { fetchApi } from "@/lib/api/client";
+
 function AdminDashboardPage() {
   const [data, setData] = useState<AdminDashboardData>({
     stats: null,
@@ -48,23 +50,13 @@ function AdminDashboardPage() {
     try {
       setData((prev) => ({ ...prev, loading: true, error: null }));
       const [statsRes, citiesRes, activitiesRes] = await Promise.all([
-        fetch("/api/admin/stats/overview"),
-        fetch("/api/admin/stats/top-cities"),
-        fetch("/api/admin/stats/top-activities"),
-      ]);
-
-      if (!statsRes.ok || !citiesRes.ok || !activitiesRes.ok) {
-        throw new Error("Failed to fetch admin data");
-      }
-
-      const [stats, topCities, topActivities] = await Promise.all([
-        statsRes.json(),
-        citiesRes.json(),
-        activitiesRes.json(),
+        fetchApi("/admin/stats/overview"),
+        fetchApi("/admin/stats/top-cities"),
+        fetchApi("/admin/stats/top-activities"),
       ]);
 
       setData({
-        stats: stats.data,
+        stats: statsRes.data,
         topCities: citiesRes.data || [],
         topActivities: activitiesRes.data || [],
         loading: false,

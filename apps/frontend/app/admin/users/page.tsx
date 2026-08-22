@@ -31,6 +31,8 @@ interface UserManagementData {
   saving: Record<string, boolean>;
 }
 
+import { fetchApi } from "@/lib/api/client";
+
 function UserManagementPage() {
   const [data, setData] = useState<UserManagementData>({
     users: [],
@@ -52,10 +54,8 @@ function UserManagementPage() {
       });
       if (data.search) params.set("search", data.search);
 
-      const res = await fetch(`/api/admin/users?${params}`);
-      if (!res.ok) throw new Error("Failed to fetch users");
-
-      const result = await res.json();
+      const result = await fetchApi(`/admin/users?${params}`);
+      
       setData((prev) => ({
         ...prev,
         users: result.data.users,
@@ -74,12 +74,10 @@ function UserManagementPage() {
   const updateUser = async (userId: string, updates: { role?: "USER" | "ADMIN"; status?: "ACTIVE" | "SUSPENDED" | "DELETED" }) => {
     setData((prev) => ({ ...prev, saving: { ...prev.saving, [userId]: true } }));
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
+      await fetchApi(`/admin/users/${userId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
       });
-      if (!res.ok) throw new Error("Failed to update user");
       await fetchUsers();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to update user");

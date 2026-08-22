@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { fetchApi } from "@/lib/api/client";
 
 interface AuditLog {
   id: string;
@@ -60,10 +61,8 @@ function SystemLogsPage() {
       if (data.filters.from) params.set("from", data.filters.from);
       if (data.filters.to) params.set("to", data.filters.to);
 
-      const res = await fetch(`/api/admin/logs?${params}`);
-      if (!res.ok) throw new Error("Failed to fetch logs");
+      const result = await fetchApi(`/admin/logs?${params}`);
 
-      const result = await res.json();
       setData((prev) => ({
         ...prev,
         logs: result.data.logs,
@@ -81,9 +80,7 @@ function SystemLogsPage() {
 
   const fetchLogDetail = async (logId: string) => {
     try {
-      const res = await fetch(`/api/admin/logs/${logId}`);
-      if (!res.ok) throw new Error("Failed to fetch log detail");
-      const result = await res.json();
+      const result = await fetchApi(`/admin/logs/${logId}`);
       setData((prev) => ({ ...prev, selectedLog: result.data }));
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to load log detail");
