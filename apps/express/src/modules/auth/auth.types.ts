@@ -11,6 +11,10 @@ export interface RegisterRequest {
   displayName?: string;
   email: string;
   password: string;
+  phone?: string;
+  city?: string;
+  country?: string;
+  additionalInfo?: string;
 }
 
 export interface RefreshRequest {

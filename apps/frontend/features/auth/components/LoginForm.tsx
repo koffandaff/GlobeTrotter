@@ -1,11 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { fetchApi } from "@/lib/api/client";
 
 export function LoginForm() {
   const router = useRouter();
+  const { login, user, isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      if (user.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, isAuthenticated, isLoading, router]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,31 +26,48 @@ export function LoginForm() {
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Reset errors
     setEmailError("");
     setPasswordError("");
-
+    setSubmitError("");
     let isValid = true;
 
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       isValid = false;
     }
 
-    // Validate password
     if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters long.");
       isValid = false;
     }
 
-    if (isValid) {
-      router.push("/");
+    if (!isValid) return;
+
+    try {
+      setIsSubmitting(true);
+      const res = await fetchApi("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (res.data && res.data.tokens) {
+        login(res.data.tokens.accessToken, res.data.user);
+        router.push("/");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setSubmitError(error.message);
+      } else {
+        setSubmitError(String(error));
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -107,7 +137,7 @@ export function LoginForm() {
             <input type="checkbox" style={{ minHeight: "auto" }} /> Remember me
           </label>
           <Link
-            href="#"
+            href="/forgot-password"
             className="field-hint"
             style={{ color: "var(--color-accent-dark)", fontWeight: 600 }}
           >
@@ -115,8 +145,14 @@ export function LoginForm() {
           </Link>
         </div>
 
-        <button className="btn btn-primary btn-block" type="submit">
-          Log in
+        {submitError && (
+          <div className="field-error" style={{ marginBottom: "16px", textAlign: "center" }}>
+            {submitError}
+          </div>
+        )}
+
+        <button className="btn btn-primary btn-block" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Logging in..." : "Log in"}
         </button>
       </form>
 

@@ -1,5 +1,5 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+export const API_URL = API_BASE_URL;
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -32,7 +32,8 @@ export async function apiClient<T>(
       ? localStorage.getItem("accessToken") || localStorage.getItem("token")
       : null);
 
-  if (token) {
+  // PREVENT SENDING "undefined" OR "null" STRINGS
+  if (token && token !== "undefined" && token !== "null") {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
@@ -50,4 +51,32 @@ export async function apiClient<T>(
   }
 
   return (json.data !== undefined ? json.data : json) as T;
+}
+
+// Keep fetchApi around for backwards compatibility with our Auth components
+export async function fetchApi(endpoint: string, options: RequestInit = {}) {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string>),
+  };
+
+  // PREVENT SENDING "undefined" OR "null" STRINGS
+  if (token && token !== "undefined" && token !== "null") {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new Error(data?.error?.message || data?.message || "An unexpected error occurred");
+  }
+
+  return data;
 }

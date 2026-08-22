@@ -1,24 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
+import { fetchApi } from "@/lib/api/client";
 import { isValidPhoneNumber } from "libphonenumber-js";
+
+import { useAuth } from "@/lib/auth/AuthContext";
 
 export function SignupForm() {
   const router = useRouter();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      if (user.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, isAuthenticated, isLoading, router]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const MAX_CHARS = 300;
 
@@ -34,7 +50,6 @@ export function SignupForm() {
   const validateEmail = (emailStr: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailStr.trim());
   const validatePhone = (phoneStr: string) => {
     try {
-      // Validates globally using strict country formats
       return isValidPhoneNumber(phoneStr);
     } catch {
       return false;
@@ -42,8 +57,10 @@ export function SignupForm() {
   };
   const validatePassword = (pass: string) => pass.length >= 6;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError("");
+    setErrors({});
 
     const newErrors: Record<string, string> = {};
 
@@ -71,10 +88,39 @@ export function SignupForm() {
 
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      router.push("/login");
+    if (Object.keys(newErrors).length > 0) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await fetchApi("/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ firstName, lastName, email, password, phone, city, country, additionalInfo }),
+      });
+      setSuccess(true);
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } catch (error) {
+      if (error instanceof Error) {
+        setSubmitError(error.message);
+      } else {
+        setSubmitError(String(error));
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  if (success) {
+    return (
+      <div style={{ maxWidth: "420px", margin: "0 auto", textAlign: "center" }}>
+        <h2>Account Created!</h2>
+        <p>Redirecting you to login...</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: "520px", margin: "0 auto" }}>
@@ -186,8 +232,14 @@ export function SignupForm() {
           </span>
         </div>
 
-        <button className="btn btn-primary btn-block" type="submit">
-          Create account
+        {submitError && (
+          <div className="field-error" style={{ marginBottom: "16px", textAlign: "center" }}>
+            {submitError}
+          </div>
+        )}
+
+        <button className="btn btn-primary btn-block" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Creating account..." : "Create account"}
         </button>
       </form>
 
