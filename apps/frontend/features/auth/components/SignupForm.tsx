@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { isValidPhoneNumber } from "libphonenumber-js";
+
 export function SignupForm() {
   const router = useRouter();
 
@@ -27,11 +29,16 @@ export function SignupForm() {
     }
   };
 
-  const validateName = (name: string) => name.trim().length > 0;
-  const validateEmail = (emailStr: string) => emailStr.includes("@") && emailStr.includes(".");
+  const validateName = (name: string) => /^[a-zA-Z\s\-']+$/.test(name.trim()) && name.trim().length > 0;
+  const validateLocation = (loc: string) => /^[a-zA-Z\s\-',\.]+$/.test(loc.trim()) && loc.trim().length > 0;
+  const validateEmail = (emailStr: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailStr.trim());
   const validatePhone = (phoneStr: string) => {
-    const digitsOnly = phoneStr.replace(/\D/g, "");
-    return digitsOnly.length >= 7 && digitsOnly.length <= 15;
+    try {
+      // Validates globally using strict country formats
+      return isValidPhoneNumber(phoneStr);
+    } catch {
+      return false;
+    }
   };
   const validatePassword = (pass: string) => pass.length >= 6;
 
@@ -41,25 +48,25 @@ export function SignupForm() {
     const newErrors: Record<string, string> = {};
 
     if (!validateName(firstName)) {
-      newErrors.firstName = "First name is required.";
+      newErrors.firstName = "Please enter a valid first name (letters only).";
     }
     if (!validateName(lastName)) {
-      newErrors.lastName = "Last name is required.";
+      newErrors.lastName = "Please enter a valid last name (letters only).";
     }
     if (!validateEmail(email)) {
-      newErrors.email = "Please enter a valid email address (must contain '@' and '.').";
+      newErrors.email = "Please enter a valid email address.";
     }
     if (!validatePhone(phone)) {
-      newErrors.phone = "Phone number must be between 7 and 15 digits.";
+      newErrors.phone = "Invalid phone number format for the provided country code.";
     }
     if (!validatePassword(password)) {
       newErrors.password = "Password must be at least 6 characters long.";
     }
-    if (!validateName(city)) {
-      newErrors.city = "City is required.";
+    if (!validateLocation(city)) {
+      newErrors.city = "Please enter a valid city name.";
     }
-    if (!validateName(country)) {
-      newErrors.country = "Country is required.";
+    if (!validateLocation(country)) {
+      newErrors.country = "Please enter a valid country name.";
     }
 
     setErrors(newErrors);
