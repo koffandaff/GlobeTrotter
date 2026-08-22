@@ -42,9 +42,39 @@ async function updateUserStatus(req: Request, res: Response): Promise<void> {
   ok(res, data);
 }
 
+async function updateMe(req: Request, res: Response): Promise<void> {
+  const data = await usersService.updateMe(req.user!.id, req.body);
+  ok(res, data);
+}
+
+async function deleteMe(req: Request, res: Response): Promise<void> {
+  await usersService.deleteMe(req.user!.id);
+  ok(res, null);
+}
+
+async function getSavedDestinations(req: Request, res: Response): Promise<void> {
+  const data = await usersService.getSavedDestinations(req.user!.id);
+  ok(res, data);
+}
+
+async function saveDestination(req: Request, res: Response): Promise<void> {
+  const data = await usersService.saveDestination(req.user!.id, req.params.cityId as string);
+  ok(res, data, 201);
+}
+
+async function removeSavedDestination(req: Request, res: Response): Promise<void> {
+  await usersService.removeSavedDestination(req.user!.id, req.params.cityId as string);
+  ok(res, null);
+}
+
 export const usersController = {
   listUsers,
   getUser,
   updateUserRole,
   updateUserStatus,
+  updateMe,
+  deleteMe,
+  getSavedDestinations,
+  saveDestination,
+  removeSavedDestination,
 };

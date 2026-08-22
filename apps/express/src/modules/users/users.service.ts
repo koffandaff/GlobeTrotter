@@ -74,3 +74,46 @@ export async function updateUserStatus(
   }
   return updated;
 }
+
+export async function updateMe(userId: string, data: { firstName?: string; lastName?: string; avatarUrl?: string; language?: string }) {
+  const updated = await usersRepository.updateProfile(userId, data);
+  if (!updated) {
+    throw new NotFoundError("user not found");
+  }
+  return updated;
+}
+
+export async function deleteMe(userId: string) {
+  await usersRepository.softDeleteUser(userId);
+}
+
+export async function getSavedDestinations(userId: string) {
+  return usersRepository.getSavedDestinations(userId);
+}
+
+export async function saveDestination(userId: string, cityId: string) {
+  try {
+    return await usersRepository.addSavedDestination(userId, cityId);
+  } catch (err: unknown) {
+    const prismaErr = err as { code?: string };
+    if (prismaErr.code === "P2002") {
+      throw new ValidationError("city is already saved");
+    }
+    if (prismaErr.code === "P2003") {
+      throw new NotFoundError("city not found");
+    }
+    throw err;
+  }
+}
+
+export async function removeSavedDestination(userId: string, cityId: string) {
+  try {
+    await usersRepository.removeSavedDestination(userId, cityId);
+  } catch (err: unknown) {
+    const prismaErr = err as { code?: string };
+    if (prismaErr.code === "P2025") {
+      throw new NotFoundError("saved destination not found");
+    }
+    throw err;
+  }
+}
