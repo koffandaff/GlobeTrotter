@@ -118,7 +118,20 @@ export async function updateProfile(
 
     return tx.user.findUnique({
       where: { id },
-      include: { preference: true },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        displayName: true,
+        avatarUrl: true,
+        role: true,
+        status: true,
+        emailVerified: true,
+        lastLoginAt: true,
+        createdAt: true,
+        preference: true,
+      }
     });
   });
 }
