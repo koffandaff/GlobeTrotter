@@ -2,6 +2,9 @@ import { prisma } from "../../shared/prisma";
 import type { CommunityTripsQuery, PaginationQuery } from "./community.types";
 
 export async function getCommunityTrips(query: CommunityTripsQuery) {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 20;
+
   const whereClause = {
     visibility: "PUBLIC" as const,
     deletedAt: null,
@@ -11,36 +14,46 @@ export async function getCommunityTrips(query: CommunityTripsQuery) {
     ? { likes: { _count: "desc" as const } } 
     : { createdAt: "desc" as const };
 
-  const [trips, total] = await Promise.all([
-    prisma.trip.findMany({
-      where: whereClause,
-      orderBy,
-      skip: (query.page - 1) * query.limit,
-      take: query.limit,
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        coverImageUrl: true,
-        createdAt: true,
-        user: {
-          select: {
-            id: true,
-            username: true,
-            displayName: true,
-            avatarUrl: true,
-          }
-        },
-        _count: {
-          select: {
-            likes: true,
-            comments: true,
-          }
+  const trips = await prisma.trip.findMany({
+    where: whereClause,
+    orderBy,
+    skip: (page - 1) * limit,
+    take: limit,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      coverImageUrl: true,
+      startDate: true,
+      endDate: true,
+      status: true,
+      currency: true,
+      createdAt: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true,
+        }
+      },
+      stops: {
+        orderBy: { sequence: "asc" },
+        take: 3,
+        select: {
+          city: { select: { name: true, country: true } }
+        }
+      },
+      _count: {
+        select: {
+          likes: true,
+          comments: true,
         }
       }
-    }),
-    prisma.trip.count({ where: whereClause })
-  ]);
+    }
+  });
+
+  const total = await prisma.trip.count({ where: whereClause });
 
   return { trips, totalItems: total };
 }

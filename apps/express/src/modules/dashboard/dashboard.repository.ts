@@ -229,14 +229,12 @@ export async function getCategoryBudgetBreakdown(userId: string): Promise<Catego
 }
 
 export async function getTripBudgetCounts(userId: string): Promise<TripBudgetCounts> {
-  const [withBudget, withoutBudget] = await Promise.all([
-    prisma.trip.count({
-      where: { userId, deletedAt: null, budget: { isNot: null } },
-    }),
-    prisma.trip.count({
-      where: { userId, deletedAt: null, budget: { is: null } },
-    }),
-  ]);
+  const withBudget = await prisma.trip.count({
+    where: { userId, deletedAt: null, budget: { isNot: null } },
+  });
+  const withoutBudget = await prisma.trip.count({
+    where: { userId, deletedAt: null, budget: { is: null } },
+  });
 
   return { tripsWithBudget: withBudget, tripsWithoutBudget: withoutBudget };
 }
