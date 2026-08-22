@@ -90,3 +90,78 @@ export function updateUserStatus(
     .update({ where: { id }, data, select: adminUserSelect })
     .then((user) => toDto(user));
 }
+
+export async function updateProfile(
+  id: string,
+  data: { firstName?: string; lastName?: string; avatarUrl?: string; language?: string }
+) {
+  return prisma.$transaction(async (tx) => {
+    const userUpdate: Prisma.UserUpdateInput = {};
+    if (data.firstName !== undefined) userUpdate.firstName = data.firstName;
+    if (data.lastName !== undefined) userUpdate.lastName = data.lastName;
+    if (data.avatarUrl !== undefined) userUpdate.avatarUrl = data.avatarUrl;
+
+    if (Object.keys(userUpdate).length > 0) {
+      await tx.user.update({
+        where: { id },
+        data: userUpdate,
+      });
+    }
+
+    if (data.language !== undefined) {
+      await tx.userPreference.upsert({
+        where: { userId: id },
+        update: { language: data.language },
+        create: { userId: id, language: data.language, preferredCurrency: 'USD' },
+      });
+    }
+
+    return tx.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        displayName: true,
+        avatarUrl: true,
+        role: true,
+        status: true,
+        emailVerified: true,
+        lastLoginAt: true,
+        createdAt: true,
+        preference: true,
+      }
+    });
+  });
+}
+
+export function softDeleteUser(id: string) {
+  return prisma.user.update({
+    where: { id },
+    data: { status: UserStatus.DELETED, deletedAt: new Date() },
+  });
+}
+
+export function getSavedDestinations(userId: string) {
+  return prisma.savedDestination.findMany({
+    where: { userId },
+    include: { city: true },
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+export function addSavedDestination(userId: string, cityId: string) {
+  return prisma.savedDestination.create({
+    data: { userId, cityId },
+    include: { city: true },
+  });
+}
+
+export function removeSavedDestination(userId: string, cityId: string) {
+  return prisma.savedDestination.delete({
+    where: {
+      userId_cityId: { userId, cityId },
+    },
+  });
+}
