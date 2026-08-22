@@ -1,139 +1,59 @@
 import { apiClient } from "@/lib/api/client";
 import type { CalendarTrip } from "../types";
 
-export const DEMO_CALENDAR_TRIPS: CalendarTrip[] = [
-  {
-    id: "demo-scandinavia-1",
-    name: "SCANDINAVIAN WINTER RETREAT",
-    description: "Northern Lights safari, Husky sledding, and Ice Hotel stay.",
-    startDate: "2025-12-28",
-    endDate: "2026-01-05",
-    status: "PLANNED",
-    colorTheme: "teal",
-    cityName: "Tromsø & Rovaniemi",
-    currency: "USD",
-    totalEstimatedCost: 4200,
-    activities: [
-      {
-        id: "act-1",
-        title: "Northern Lights Safari",
-        category: "Sightseeing",
-        startTime: "20:00",
-        endTime: "00:00",
-        estimatedCost: 120,
-        currency: "USD",
-        cityName: "Tromsø",
-        notes: "Dress warmly in layers. Pick up at hotel lobby.",
-      },
-      {
-        id: "act-2",
-        title: "Husky Sledding Adventure",
-        category: "Adventure",
-        startTime: "10:00",
-        endTime: "14:00",
-        estimatedCost: 180,
-        currency: "USD",
-        cityName: "Rovaniemi",
-        notes: "Includes hot berry juice and cookies around the fire.",
-      },
-      {
-        id: "act-3",
-        title: "Ice Hotel Overnight Stay",
-        category: "Accommodation",
-        startTime: "18:00",
-        endTime: "10:00",
-        estimatedCost: 350,
-        currency: "USD",
-        cityName: "Rovaniemi",
-        notes: "Thermal sleeping bags provided.",
-      },
-    ],
-  },
-  {
-    id: "demo-south-america-2",
-    name: "SOUTH AMERICAN EXPEDITION",
-    description: "Machu Picchu trek and Sacred Valley exploration.",
-    startDate: "2026-01-12",
-    endDate: "2026-01-20",
-    status: "ONGOING",
-    colorTheme: "rust",
-    cityName: "Lima & Cusco, Peru",
-    currency: "USD",
-    totalEstimatedCost: 2800,
-    activities: [
-      {
-        id: "act-4",
-        title: "Historic Center Walk & Ceviche",
-        category: "Food & Dining",
-        startTime: "12:00",
-        endTime: "15:00",
-        estimatedCost: 85,
-        currency: "USD",
-        cityName: "Lima",
-        notes: "Masterclass with local chef.",
-      },
-      {
-        id: "act-5",
-        title: "Machu Picchu Day Tour",
-        category: "Adventure",
-        startTime: "05:00",
-        endTime: "18:00",
-        estimatedCost: 200,
-        currency: "USD",
-        cityName: "Cusco",
-        notes: "Vistadome train. Remember passport.",
-      },
-      {
-        id: "act-6",
-        title: "Andean Traditional Dinner",
-        category: "Food & Dining",
-        startTime: "19:00",
-        endTime: "21:00",
-        estimatedCost: 40,
-        currency: "USD",
-        cityName: "Cusco",
-        notes: "Local delicacies and music.",
-      },
-    ],
-  },
-  {
-    id: "demo-mediterranean-3",
-    name: "MEDITERRANEAN YACHT WEEK",
-    description: "Island hopping and sunset sailing.",
-    startDate: "2026-01-22",
-    endDate: "2026-01-28",
-    status: "COMPLETED",
-    colorTheme: "gold",
-    cityName: "Split & Mykonos",
-    currency: "USD",
-    totalEstimatedCost: 3500,
-    activities: [
-      {
-        id: "act-7",
-        title: "Sunset Catamaran Cruise",
-        category: "Leisure",
-        startTime: "17:00",
-        endTime: "21:00",
-        estimatedCost: 200,
-        currency: "USD",
-        cityName: "Mykonos",
-        notes: "Open bar and seafood appetizers.",
-      },
-      {
-        id: "act-8",
-        title: "Diocletian's Palace Tour",
-        category: "Culture",
-        startTime: "10:00",
-        endTime: "12:00",
-        estimatedCost: 25,
-        currency: "USD",
-        cityName: "Split",
-        notes: "Guided historical walk.",
-      },
-    ],
-  },
+const THEMES: ("teal" | "gold" | "rust" | "forest" | "sage")[] = [
+  "teal", "gold", "rust", "forest", "sage"
 ];
 
 export async function fetchCalendarTrips(): Promise<CalendarTrip[]> {
-  return DEMO_CALENDAR_TRIPS;
+  try {
+    // 1. Fetch user's trips
+    const data = await apiClient<{ trips: any[] }>("/trips?limit=10");
+    const trips = data.trips || [];
+
+    // 2. Fetch calendar details for each trip
+    const calendarTrips = await Promise.all(
+      trips.map(async (trip, index) => {
+        try {
+          const res = await apiClient<any>(`/trips/${trip.id}/calendar`);
+          
+          return {
+            id: trip.id,
+            name: trip.name,
+            description: trip.description,
+            startDate: trip.startDate ? trip.startDate.split("T")[0] : "",
+            endDate: trip.endDate ? trip.endDate.split("T")[0] : "",
+            status: trip.status,
+            colorTheme: THEMES[index % THEMES.length],
+            cityName: trip.stopsCount > 0 ? `${trip.stopsCount} Destination${trip.stopsCount > 1 ? "s" : ""}` : "No destinations",
+            currency: trip.currency,
+            totalEstimatedCost: trip.totalEstimatedCost,
+            coverImageUrl: trip.coverImageUrl,
+            activities: res.days?.flatMap((d: any) => d.activities || []) || [],
+          } as CalendarTrip;
+        } catch {
+          // Fallback if calendar specific fetch fails
+          return {
+            id: trip.id,
+            name: trip.name,
+            description: trip.description,
+            startDate: trip.startDate ? trip.startDate.split("T")[0] : "",
+            endDate: trip.endDate ? trip.endDate.split("T")[0] : "",
+            status: trip.status,
+            colorTheme: THEMES[index % THEMES.length],
+            currency: trip.currency,
+            totalEstimatedCost: trip.totalEstimatedCost,
+            coverImageUrl: trip.coverImageUrl,
+            activities: [],
+          } as CalendarTrip;
+        }
+      })
+    );
+
+    // Filter out trips without start and end dates as they can't be rendered on the calendar
+    return calendarTrips.filter(t => t.startDate && t.endDate);
+  } catch (error) {
+    console.error("Failed to fetch calendar trips", error);
+    return [];
+  }
 }
