@@ -27,3 +27,5 @@ tsconfig.tsbuildinfo
 # next.js generated agent docs
 AGENTS.md
 CLAUDE.md
+apiendpints.md
+docs/GlobeTrotter.pdf
