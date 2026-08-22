@@ -18,30 +18,30 @@ export interface Trip {
 export const trips: Trip[] = [
   {
     id: "t1",
-    name: "Florida Getaway",
-    destination: "Miami, USA",
-    startDate: "2024-11-02",
-    endDate: "2024-11-09",
+    name: "Mediterranean Summer Yacht Week",
+    destination: "Split & Mykonos",
+    startDate: "2024-08-10",
+    endDate: "2024-08-20",
     status: "completed",
-    budget: 1800,
+    budget: 3500,
   },
   {
     id: "t2",
-    name: "West Coast Trip",
-    destination: "Los Angeles, USA",
-    startDate: "2025-04-15",
-    endDate: "2025-04-22",
+    name: "Scandinavian Winter Retreat",
+    destination: "Norway & Finland",
+    startDate: "2025-12-15",
+    endDate: "2025-12-28",
     status: "upcoming",
-    budget: 2200,
+    budget: 4200,
   },
   {
     id: "t3",
-    name: "Euro Backpacking",
-    destination: "Multiple Cities, Europe",
-    startDate: "2026-06-01",
-    endDate: "2026-07-15",
-    status: "upcoming",
-    budget: 4500,
+    name: "The South American Expedition",
+    destination: "Peru",
+    startDate: "2026-06-05",
+    endDate: "2026-06-25",
+    status: "ongoing",
+    budget: 2800,
   },
 ];
 
@@ -61,7 +61,7 @@ export const currentUser: User = {
   lastName: "Doe",
   email: "jane@example.com",
   preferredLanguage: "English",
-  savedDestinations: ["Tokyo", "Paris", "New York"],
+  savedDestinations: ["Cusco", "Tromsø", "Mykonos"],
 };
 
 export interface CityOption {
@@ -76,11 +76,11 @@ export interface CityOption {
 }
 
 export const popularCities: CityOption[] = [
-  { id: "c1", name: "Tokyo", country: "Japan", region: "Asia", costIndex: "Mid-range", popularity: 95 },
-  { id: "c2", name: "Paris", country: "France", region: "Europe", costIndex: "Luxury", popularity: 98 },
-  { id: "c3", name: "New York", country: "USA", region: "Americas", costIndex: "Luxury", popularity: 96 },
-  { id: "c4", name: "Bangkok", country: "Thailand", region: "Asia", costIndex: "Budget", popularity: 90 },
-  { id: "c5", name: "Prague", country: "Czech Republic", region: "Europe", costIndex: "Budget", popularity: 85 },
+  { id: "c1", name: "Cusco", country: "Peru", region: "South America", costIndex: "Budget", popularity: 92 },
+  { id: "c2", name: "Tromsø", country: "Norway", region: "Europe", costIndex: "Luxury", popularity: 88 },
+  { id: "c3", name: "Split", country: "Croatia", region: "Europe", costIndex: "Mid-range", popularity: 95 },
+  { id: "c4", name: "Rovaniemi", country: "Finland", region: "Europe", costIndex: "Luxury", popularity: 82 },
+  { id: "c5", name: "Mykonos", country: "Greece", region: "Europe", costIndex: "Luxury", popularity: 98 },
 ];
 
 export interface ActivityOption {
@@ -93,12 +93,11 @@ export interface ActivityOption {
 }
 
 export const activities: ActivityOption[] = [
-  { id: "a1", name: "Tsukiji Outer Market", type: "Food", city: "Tokyo", duration: "3 hours", cost: 30 },
-  { id: "a2", name: "Eiffel Tower Tour", type: "Sightseeing", city: "Paris", duration: "2 hours", cost: 45 },
-  { id: "a3", name: "Statue of Liberty Cruise", type: "Sightseeing", city: "New York", duration: "4 hours", cost: 60 },
-  { id: "a4", name: "Street Food Tour", type: "Food", city: "Bangkok", duration: "3 hours", cost: 15 },
-  { id: "a5", name: "Prague Castle Walk", type: "Sightseeing", city: "Prague", duration: "2.5 hours", cost: 20 },
-  { id: "a6", name: "Helicopter Ride", type: "Adventure", city: "New York", duration: "1 hour", cost: 250 },
+  { id: "a1", name: "Machu Picchu Trek", type: "Adventure", city: "Cusco", duration: "8 hours", cost: 150 },
+  { id: "a2", name: "Northern Lights Safari", type: "Sightseeing", city: "Tromsø", duration: "4 hours", cost: 120 },
+  { id: "a3", name: "Diocletian's Palace Tour", type: "Culture", city: "Split", duration: "2 hours", cost: 25 },
+  { id: "a4", name: "Husky Sledding", type: "Adventure", city: "Rovaniemi", duration: "3 hours", cost: 180 },
+  { id: "a5", name: "Sunset Catamaran Cruise", type: "Leisure", city: "Mykonos", duration: "5 hours", cost: 200 },
 ];
 
 export interface TripSuggestion {
@@ -110,35 +109,35 @@ export interface TripSuggestion {
 export const tripSuggestions: TripSuggestion[] = [
   {
     id: "s1",
-    name: "Kyoto, Japan",
-    description: "Experience ancient temples and beautiful gardens.",
+    name: "Patagonia Highlights",
+    description: "Hike the breathtaking glaciers and peaks of southern Chile and Argentina.",
   },
   {
     id: "s2",
-    name: "Santorini, Greece",
-    description: "Relax by the stunning blue-domed churches and ocean views.",
+    name: "Iceland Ring Road",
+    description: "Drive past waterfalls, volcanoes, and black sand beaches.",
   },
   {
     id: "s3",
-    name: "Banff, Canada",
-    description: "Explore majestic mountains and turquoise glacial lakes.",
+    name: "Amalfi Coast Drive",
+    description: "Experience the vibrant cliffside villages and crystal clear waters of Italy.",
   },
 ];
 
 export interface Activity {
   id: string;
   name: string;
-  type: string; // e.g. "Sightseeing", "Food", "Adventure"
-  duration?: string; // e.g. "2 hours"
+  type: string;
+  duration?: string;
   cost?: number;
-  day: number; // e.g. 1, 2, 3 - which day of that stop this activity is on
+  day: number;
   category: "transport" | "stay" | "activities" | "meals";
 }
 
 export interface ItineraryStop {
   id: string;
   city: string;
-  startDate: string; // ISO date string
+  startDate: string;
   endDate: string;
   activities: Activity[];
 }
@@ -148,28 +147,26 @@ export const dailyBudgetLimit = 250;
 export const itineraryStops: ItineraryStop[] = [
   {
     id: "stop1",
-    city: "Miami, USA",
-    startDate: "2024-11-02",
-    endDate: "2024-11-05",
+    city: "Lima, Peru",
+    startDate: "2026-06-05",
+    endDate: "2026-06-08",
     activities: [
-      { id: "act1", name: "Flight to Miami", type: "Travel", cost: 150, day: 1, category: "transport" },
-      { id: "act2", name: "Ocean Drive Hotel", type: "Accommodation", cost: 200, day: 1, category: "stay" },
-      { id: "act3", name: "South Beach Walk", type: "Sightseeing", duration: "2 hours", cost: 0, day: 1, category: "activities" },
-      { id: "act4", name: "Cuban Dinner at Versailles", type: "Food", cost: 45, day: 1, category: "meals" },
-      { id: "act5", name: "Art Deco District Tour", type: "Sightseeing", duration: "3 hours", cost: 30, day: 2, category: "activities" },
-      { id: "act6", name: "Lunch at Joe's Stone Crab", type: "Food", cost: 80, day: 2, category: "meals" },
+      { id: "act1", name: "Flight to Lima", type: "Travel", cost: 450, day: 1, category: "transport" },
+      { id: "act2", name: "Miraflores Boutique Hotel", type: "Accommodation", cost: 120, day: 1, category: "stay" },
+      { id: "act3", name: "Historic Center Walk", type: "Sightseeing", duration: "3 hours", cost: 0, day: 1, category: "activities" },
+      { id: "act4", name: "Ceviche Masterclass", type: "Food", cost: 85, day: 2, category: "meals" },
     ],
   },
   {
     id: "stop2",
-    city: "Key West, USA",
-    startDate: "2024-11-05",
-    endDate: "2024-11-09",
+    city: "Cusco, Peru",
+    startDate: "2026-06-08",
+    endDate: "2026-06-15",
     activities: [
-      { id: "act7", name: "Drive to Key West", type: "Travel", cost: 50, day: 1, category: "transport" },
-      { id: "act8", name: "Sunset Key Guest Cottages", type: "Accommodation", cost: 300, day: 1, category: "stay" },
-      { id: "act9", name: "Snorkeling Tour", type: "Adventure", duration: "4 hours", cost: 120, day: 1, category: "activities" },
-      { id: "act10", name: "Duval Street Pub Crawl", type: "Food", cost: 60, day: 2, category: "meals" },
+      { id: "act5", name: "Flight to Cusco", type: "Travel", cost: 90, day: 1, category: "transport" },
+      { id: "act6", name: "Sacred Valley Lodge", type: "Accommodation", cost: 150, day: 1, category: "stay" },
+      { id: "act7", name: "Machu Picchu Day Tour", type: "Adventure", duration: "10 hours", cost: 200, day: 2, category: "activities" },
+      { id: "act8", name: "Andean Traditional Dinner", type: "Food", cost: 40, day: 2, category: "meals" },
     ],
   },
 ];
@@ -177,69 +174,69 @@ export const itineraryStops: ItineraryStop[] = [
 export interface CommunityPost {
   id: string;
   authorName: string;
-  authorInitials: string; // e.g. "JD"
-  tripOrActivityName: string; // e.g. "South Beach Walk"
-  activityType: string; // e.g. "Sightseeing", "Food", "Adventure"
-  destination: string; // e.g. "Miami, USA"
+  authorInitials: string;
+  tripOrActivityName: string;
+  activityType: string;
+  destination: string;
   content: string;
-  postedDate: string; // ISO string
+  postedDate: string;
   likeCount: number;
 }
 
 export const communityPosts: CommunityPost[] = [
   {
     id: "post1",
-    authorName: "Alex Rivera",
-    authorInitials: "AR",
-    tripOrActivityName: "Snorkeling Tour",
+    authorName: "Carlos Mendoza",
+    authorInitials: "CM",
+    tripOrActivityName: "Machu Picchu Trek",
     activityType: "Adventure",
-    destination: "Key West, USA",
-    content: "Saw a sea turtle today! The water was perfectly clear and the guides were super helpful. Highly recommend adding this to your Key West itinerary.",
-    postedDate: "2026-08-18T14:30:00Z",
-    likeCount: 42,
+    destination: "Cusco, Peru",
+    content: "Absolutely breathtaking! The altitude was tough, but reaching the Sun Gate at dawn was a once-in-a-lifetime experience. Make sure to pack coca leaves!",
+    postedDate: "2026-08-10T14:30:00Z",
+    likeCount: 215,
   },
   {
     id: "post2",
-    authorName: "Sarah Chen",
-    authorInitials: "SC",
-    tripOrActivityName: "Eiffel Tower at Night",
-    activityType: "Sightseeing",
-    destination: "Paris, France",
-    content: "It sparkles every hour on the hour! It gets quite crowded, so definitely book your tickets at least two months in advance to skip the line.",
-    postedDate: "2026-08-20T09:15:00Z",
-    likeCount: 128,
+    authorName: "Sofia Lindberg",
+    authorInitials: "SL",
+    tripOrActivityName: "Northern Lights Safari",
+    activityType: "Nature",
+    destination: "Tromsø, Norway",
+    content: "We were lucky enough to see the aurora dancing across the sky for a full 20 minutes! Wrap up warm though, it gets freezing out on the fjords.",
+    postedDate: "2026-08-15T09:15:00Z",
+    likeCount: 342,
   },
   {
     id: "post3",
-    authorName: "Marcus Johnson",
-    authorInitials: "MJ",
-    tripOrActivityName: "Cuban Dinner at Versailles",
-    activityType: "Food",
-    destination: "Miami, USA",
-    content: "Best empanadas and cafecito I've ever had. It's affordable too, coming in at just under $45 for two people. A must-visit.",
-    postedDate: "2026-08-21T18:45:00Z",
-    likeCount: 15,
+    authorName: "Mateo Rossi",
+    authorInitials: "MR",
+    tripOrActivityName: "Sunset Catamaran Cruise",
+    activityType: "Leisure",
+    destination: "Mykonos, Greece",
+    content: "The water was crystal clear and the sunset was unreal. Definitely spring for the premium package, the seafood appetizers were incredible.",
+    postedDate: "2026-08-18T18:45:00Z",
+    likeCount: 128,
   },
   {
     id: "post4",
-    authorName: "Elena Rodriguez",
-    authorInitials: "ER",
-    tripOrActivityName: "Colosseum Tour",
-    activityType: "Sightseeing",
-    destination: "Rome, Italy",
-    content: "Mind-blowing history. We opted for the underground tour which gave us access to areas most tourists don't see. Wear very comfortable walking shoes!",
-    postedDate: "2026-08-15T11:20:00Z",
-    likeCount: 89,
+    authorName: "Emma Virtanen",
+    authorInitials: "EV",
+    tripOrActivityName: "Husky Sledding",
+    activityType: "Adventure",
+    destination: "Rovaniemi, Finland",
+    content: "The dogs were so excited and friendly! Gliding through the snowy forests felt completely magical. A must-do if you visit Lapland.",
+    postedDate: "2026-08-19T11:20:00Z",
+    likeCount: 189,
   },
   {
     id: "post5",
-    authorName: "David Kim",
-    authorInitials: "DK",
-    tripOrActivityName: "Sushi making class",
-    activityType: "Experience",
-    destination: "Tokyo, Japan",
-    content: "Such a fun experience. We learned how to properly slice sashimi and prepare the rice. Got to eat everything we made at the end!",
-    postedDate: "2026-08-22T08:10:00Z",
-    likeCount: 204,
+    authorName: "Luka Kovač",
+    authorInitials: "LK",
+    tripOrActivityName: "Diocletian's Palace Tour",
+    activityType: "Culture",
+    destination: "Split, Croatia",
+    content: "Walking through a living Roman palace is surreal. The fact that people still live and work within its walls gives the city such an amazing vibe.",
+    postedDate: "2026-08-20T08:10:00Z",
+    likeCount: 87,
   }
 ];

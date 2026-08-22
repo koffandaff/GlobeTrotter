@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useProfile } from "../hooks/useProfile";
+import { AvatarUpload } from "@/components/ui/AvatarUpload";
 
 export function ProfileView() {
   const {
@@ -53,17 +54,20 @@ export function ProfileView() {
     if (Object.keys(errors).length > 0) return;
 
     setIsSaving(true);
+    // Map preferredLanguage to language for the backend
     const res = await updateProfile({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      displayName: displayName.trim() || undefined,
-      preferredLanguage: language,
-    });
+      language: language,
+    } as any);
     setIsSaving(false);
 
     if (res.success) {
+      setFormErrors({});
       setShowSavedToast(true);
       setTimeout(() => setShowSavedToast(false), 3500);
+    } else {
+      setFormErrors({ _global: res.error || "Failed to update profile" });
     }
   };
 
@@ -136,23 +140,8 @@ export function ProfileView() {
             border: "1px solid var(--color-border)",
           }}
         >
-          <div
-            style={{
-              width: "88px",
-              height: "88px",
-              borderRadius: "50%",
-              background: "var(--color-accent)",
-              color: "#ffffff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 800,
-              fontSize: "2rem",
-              margin: "0 auto 16px",
-              boxShadow: "var(--shadow-md)",
-            }}
-          >
-            {initials}
+          <div style={{ marginBottom: "16px" }}>
+            <AvatarUpload initials={initials} />
           </div>
 
           <h2 style={{ margin: "0 0 4px 0", fontSize: "1.3rem" }}>
@@ -192,7 +181,35 @@ export function ProfileView() {
               Personal Information
             </h3>
 
+            {formErrors._global && (
+              <div style={{ padding: "10px", background: "rgba(220, 53, 69, 0.1)", color: "var(--color-danger)", border: "1px solid var(--color-danger)", borderRadius: "var(--radius-sm)", marginBottom: "16px", fontSize: "0.9rem" }}>
+                {formErrors._global}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit}>
+              <div className="field" style={{ marginBottom: "16px" }}>
+                <label htmlFor="userEmail" style={{ fontWeight: 600, display: "block", marginBottom: "6px" }}>
+                  Email Address
+                </label>
+                <input
+                  id="userEmail"
+                  type="email"
+                  value={profile.email || ""}
+                  disabled
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--color-border)",
+                    background: "var(--color-surface-alt)",
+                    color: "var(--color-text-muted)",
+                    fontSize: "0.92rem",
+                    cursor: "not-allowed",
+                  }}
+                />
+              </div>
+
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
                 <div className="field">
                   <label htmlFor="userFirstName" style={{ fontWeight: 600, display: "block", marginBottom: "6px" }}>
@@ -241,25 +258,6 @@ export function ProfileView() {
                     </span>
                   )}
                 </div>
-              </div>
-
-              <div className="field" style={{ marginBottom: "16px" }}>
-                <label htmlFor="userDisplayName" style={{ fontWeight: 600, display: "block", marginBottom: "6px" }}>
-                  Display Name
-                </label>
-                <input
-                  id="userDisplayName"
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    border: "1px solid var(--color-border)",
-                    fontSize: "0.92rem",
-                  }}
-                />
               </div>
 
               <div className="field" style={{ marginBottom: "24px" }}>

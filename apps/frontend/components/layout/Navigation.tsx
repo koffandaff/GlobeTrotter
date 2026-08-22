@@ -2,15 +2,22 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const [avatar, setAvatar] = useState<string | null>(null);
 
   const toggleNav = () => setIsOpen(!isOpen);
   const closeNav = () => setIsOpen(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/login");
+    closeNav();
+  };
 
   const isAuthPage = pathname === "/login" || pathname === "/signup";
 
@@ -75,7 +82,7 @@ export function Navigation() {
                 GlobeTrotter
               </span>
             ) : (
-              <Link href="/" className="brand" onClick={closeNav}>
+              <Link href="/dashboard" className="brand" onClick={closeNav}>
                 <span className="brand-mark" aria-hidden="true"></span>
                 GlobeTrotter
               </Link>
@@ -119,6 +126,31 @@ export function Navigation() {
           );
         })}
 
+        <div
+          style={{
+            marginTop: "auto",
+            paddingTop: "16px",
+            borderTop: "1px solid var(--color-border)",
+          }}
+        >
+          <button
+            onClick={handleLogout}
+            style={{
+              display: "block",
+              width: "100%",
+              textAlign: "left",
+              padding: "12px 24px",
+              background: "none",
+              border: "none",
+              color: "var(--color-danger)",
+              fontWeight: 600,
+              fontSize: "1rem",
+              cursor: "pointer",
+            }}
+          >
+            Log out
+          </button>
+        </div>
       </nav>
     </>
   );
