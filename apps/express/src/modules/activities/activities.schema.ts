@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 export const activitySearchQuerySchema = z.object({
-  cityId: z.string().uuid("cityId must be a valid UUID"),
+  cityId: z.string().uuid("cityId must be a valid UUID").optional(),
   category: z.string().optional(),
+  search: z.string().optional(),
   maxCost: z.coerce.number().positive().optional(),
   maxDuration: z.coerce.number().positive().optional(),
   page: z.coerce.number().int().min(1).default(1),
