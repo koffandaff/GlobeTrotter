@@ -1,0 +1,10 @@
+export const API_PREFIX = "/api";
+export const BODY_LIMIT = "16mb";
+export const REQUEST_ID_HEADER = "x-request-id";
+export const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+export const LOGIN_RATE_LIMIT_MAX = 10;
+export const OTP_RATE_LIMIT_MAX = 5;
+export const REGISTER_RATE_LIMIT_MAX = 10;
+export const OTP_CODE_LENGTH = 6;
+export const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_MAX_LENGTH = 72;
