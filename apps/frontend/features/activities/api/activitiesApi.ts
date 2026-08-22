@@ -1,5 +1,11 @@
 import { apiClient } from "@/lib/api/client";
-import type { Activity, ListActivitiesParams } from "../types";
+import type {
+  Activity,
+  CreateStopActivityInput,
+  ListActivitiesParams,
+  StopActivityItem,
+  UpdateStopActivityInput,
+} from "../types";
 
 export const DEMO_ACTIVITIES: Activity[] = [
   {
@@ -95,6 +101,7 @@ export const DEMO_ACTIVITIES: Activity[] = [
   },
 ];
 
+// Activity Catalog (GET /api/activities)
 export async function searchActivities(
   params: ListActivitiesParams = {}
 ): Promise<{ activities: Activity[]; total: number }> {
@@ -102,6 +109,7 @@ export async function searchActivities(
     const query = new URLSearchParams();
     if (params.cityId) query.set("cityId", params.cityId);
     if (params.category) query.set("category", params.category);
+    if (params.search) query.set("search", params.search);
     if (params.maxCost) query.set("maxCost", String(params.maxCost));
     if (params.maxDuration) query.set("maxDuration", String(params.maxDuration));
     if (params.page) query.set("page", String(params.page));
@@ -143,4 +151,52 @@ export async function searchActivities(
 
 export async function getActivity(id: string): Promise<Activity> {
   return apiClient<Activity>(`/activities/${id}`);
+}
+
+// Stop Activities Scheduling (Module 7 CRUD)
+export async function listStopActivities(stopId: string): Promise<StopActivityItem[]> {
+  try {
+    const res = await apiClient<StopActivityItem[] | { items: StopActivityItem[] }>(
+      `/stops/${stopId}/activities`
+    );
+    return Array.isArray(res) ? res : (res as { items: StopActivityItem[] }).items || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function addActivityToStop(
+  stopId: string,
+  input: CreateStopActivityInput
+): Promise<StopActivityItem> {
+  return apiClient<StopActivityItem>(`/stops/${stopId}/activities`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function updateItineraryItem(
+  activityId: string,
+  input: UpdateStopActivityInput
+): Promise<StopActivityItem> {
+  return apiClient<StopActivityItem>(`/trip-activities/${activityId}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function reorderItineraryItem(
+  activityId: string,
+  newSequence: number
+): Promise<{ success: boolean }> {
+  return apiClient<{ success: boolean }>(`/trip-activities/${activityId}/reorder`, {
+    method: "PATCH",
+    body: JSON.stringify({ newSequence }),
+  });
+}
+
+export async function deleteTripActivity(activityId: string): Promise<{ success: boolean }> {
+  return apiClient<{ success: boolean }>(`/trip-activities/${activityId}`, {
+    method: "DELETE",
+  });
 }

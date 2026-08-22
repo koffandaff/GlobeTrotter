@@ -23,7 +23,8 @@ export async function getCurrentUserProfile(): Promise<UserProfile> {
   try {
     const user = await apiClient<UserProfile>("/users/me");
     return user;
-  } catch {
+  } catch (err) {
+    console.error("Failed to fetch user profile:", err);
     return DEMO_PROFILE;
   }
 }

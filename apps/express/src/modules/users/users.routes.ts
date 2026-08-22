@@ -15,6 +15,9 @@ import {
 
 const router = Router();
 
+// --- Public Routes ---
+router.get("/avatar", usersController.getAvatarByEmail);
+
 // --- Personal Profile Routes (Authenticated Only) ---
 router.use(authenticate);
 

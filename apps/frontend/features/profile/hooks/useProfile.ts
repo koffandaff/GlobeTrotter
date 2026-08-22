@@ -42,14 +42,16 @@ export function useProfile() {
   };
 
   const handleRemoveDestination = async (cityId: string) => {
+    // Optimistic update
+    if (profile) {
+      setProfile({
+        ...profile,
+        savedDestinations: profile.savedDestinations?.filter((d) => d.id !== cityId),
+      });
+    }
+    
     try {
       await removeSavedDestination(cityId);
-      if (profile) {
-        setProfile({
-          ...profile,
-          savedDestinations: profile.savedDestinations?.filter((d) => d.id !== cityId),
-        });
-      }
       return { success: true };
     } catch (err) {
       return { success: false, error: err instanceof Error ? err.message : "Failed to remove destination." };

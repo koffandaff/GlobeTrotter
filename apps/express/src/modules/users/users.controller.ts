@@ -72,6 +72,25 @@ async function getMe(req: Request, res: Response): Promise<void> {
   ok(res, data);
 }
 
+async function getAvatarByEmail(req: Request, res: Response): Promise<void> {
+  const email = req.query.email as string;
+  if (!email) {
+    res.status(400).json({ success: false, message: "email is required" });
+    return;
+  }
+  
+  try {
+    const data = await usersService.getAvatarByEmail(email);
+    ok(res, data);
+  } catch (error: any) {
+    if (error.name === "NotFoundError") {
+      res.status(404).json({ success: false, message: "user not found" });
+    } else {
+      throw error;
+    }
+  }
+}
+
 export const usersController = {
   listUsers,
   getUser,
@@ -83,4 +102,5 @@ export const usersController = {
   getSavedDestinations,
   saveDestination,
   removeSavedDestination,
+  getAvatarByEmail,
 };

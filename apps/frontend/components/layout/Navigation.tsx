@@ -3,18 +3,20 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [avatar, setAvatar] = useState<string | null>(null);
+  const { user, logout } = useAuth();
 
   const toggleNav = () => setIsOpen(!isOpen);
   const closeNav = () => setIsOpen(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     router.push("/login");
     closeNav();
   };
@@ -56,7 +58,7 @@ export function Navigation() {
       <header className="site-header">
         <div className="site-header-inner">
           <div className="flex items-center gap-2">
-            {!isAuthPage && (
+            {!isAuthPage && user?.role !== "ADMIN" && (
               <button
                 className="nav-toggle"
                 aria-label="Toggle navigation menu"
@@ -82,7 +84,7 @@ export function Navigation() {
                 GlobeTrotter
               </span>
             ) : (
-              <Link href="/dashboard" className="brand" onClick={closeNav}>
+              <Link href={user?.role === "ADMIN" ? "/admin" : "/dashboard"} className="brand" onClick={closeNav}>
                 <span className="brand-mark" aria-hidden="true"></span>
                 GlobeTrotter
               </Link>
@@ -90,68 +92,66 @@ export function Navigation() {
           </div>
 
           {!isAuthPage && (
-            <div className="header-actions">
-              <Link href="/profile" className="avatar-btn" aria-label="User profile" style={{ padding: avatar ? 0 : undefined, overflow: "hidden" }}>
-                {avatar ? (
+            <div className="header-actions" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <Link href={user?.role === "ADMIN" ? "/admin" : "/profile"} className="avatar-btn" aria-label={user?.role === "ADMIN" ? "Admin dashboard" : "User profile"} style={{ padding: (avatar && user?.role !== "ADMIN") ? 0 : undefined, overflow: "hidden" }}>
+                {user?.role === "ADMIN" ? "AP" : avatar ? (
                   <img src={avatar} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 ) : (
-                  "VP"
+                  user ? (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase() : "U"
                 )}
               </Link>
+              <button
+                onClick={handleLogout}
+                className="btn btn-ghost"
+                style={{
+                  padding: "6px 12px",
+                  fontSize: "0.85rem",
+                  color: "var(--color-danger)"
+                }}
+              >
+                Logout
+              </button>
             </div>
           )}
         </div>
       </header>
 
-      <div
-        className={`nav-backdrop ${isOpen ? "open" : ""}`}
-        onClick={closeNav}
-        aria-hidden="true"
-      />
+      {user?.role !== "ADMIN" && (
+        <>
+          <div
+            className={`nav-backdrop ${isOpen ? "open" : ""}`}
+            onClick={closeNav}
+            aria-hidden="true"
+          />
 
-      <nav className={`main-nav ${isOpen ? "open" : ""}`} aria-label="Primary">
-        {navLinks.map((link) => {
-          const isActive =
-            pathname === link.href || (pathname === "/" && link.href === "/dashboard");
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={isActive ? "active" : ""}
-              aria-current={isActive ? "page" : undefined}
-              onClick={closeNav}
+          <nav className={`main-nav ${isOpen ? "open" : ""}`} aria-label="Primary">
+            {navLinks.map((link) => {
+              const isActive =
+                pathname === link.href || (pathname === "/" && link.href === "/dashboard");
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={isActive ? "active" : ""}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={closeNav}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+
+            <div
+              style={{
+                marginTop: "auto",
+                paddingTop: "16px",
+                borderTop: "1px solid var(--color-border)",
+              }}
             >
-              {link.label}
-            </Link>
-          );
-        })}
-
-        <div
-          style={{
-            marginTop: "auto",
-            paddingTop: "16px",
-            borderTop: "1px solid var(--color-border)",
-          }}
-        >
-          <button
-            onClick={handleLogout}
-            style={{
-              display: "block",
-              width: "100%",
-              textAlign: "left",
-              padding: "12px 24px",
-              background: "none",
-              border: "none",
-              color: "var(--color-danger)",
-              fontWeight: 600,
-              fontSize: "1rem",
-              cursor: "pointer",
-            }}
-          >
-            Log out
-          </button>
-        </div>
-      </nav>
+            </div>
+          </nav>
+        </>
+      )}
     </>
   );
 }

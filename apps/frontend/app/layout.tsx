@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Empowering Personalized Travel Planning",
 };
 
+import { AuthGuard } from "@/lib/auth/AuthGuard";
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -25,11 +27,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <AuthProvider>
-          <div className="app-shell">
-            <Navigation />
-            {children}
-            <footer className="site-footer">GlobeTrotter — Hackathon</footer>
-          </div>
+          <AuthGuard>
+            <div className="app-shell">
+              <Navigation />
+              {children}
+              <footer className="site-footer">GlobeTrotter — Hackathon</footer>
+            </div>
+          </AuthGuard>
         </AuthProvider>
       </body>
     </html>

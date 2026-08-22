@@ -283,6 +283,9 @@ export async function getTripBudgetCounts(userId: string): Promise<TripBudgetCou
   const withBudget = await prisma.tripBudget.count({
     where: { trip: { userId, deletedAt: null } },
   });
+  return { tripsWithBudget: withBudget, tripsWithoutBudget: Math.max(0, allTrips - withBudget) };
+}
+
 
   return { tripsWithBudget: withBudget, tripsWithoutBudget: Math.max(0, allTrips - withBudget) };
 }
