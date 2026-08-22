@@ -11,6 +11,8 @@ export function Navigation() {
   const toggleNav = () => setIsOpen(!isOpen);
   const closeNav = () => setIsOpen(false);
 
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeNav();
@@ -22,16 +24,15 @@ export function Navigation() {
   const navLinks = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/create-trip", label: "Plan a Trip" },
-    { href: "/my-trips", label: "My Trips" },
     { href: "/itinerary-builder", label: "Itinerary Builder" },
-    { href: "/itinerary-view", label: "Itinerary View" },
-    { href: "/community", label: "Community" },
+    { href: "/my-trips", label: "My Trips" },
+    { href: "/profile", label: "Profile" },
     { href: "/city-search", label: "City Search" },
     { href: "/activity-search", label: "Activities" },
+    { href: "/itinerary-view", label: "Itinerary View" },
     { href: "/budget", label: "Budget" },
+    { href: "/community", label: "Community" },
     { href: "/calendar", label: "Calendar" },
-    { href: "/shared-itinerary", label: "Shared View" },
-    { href: "/profile", label: "Profile" },
     { href: "/admin", label: "Admin" },
   ];
 
@@ -40,35 +41,46 @@ export function Navigation() {
       <header className="site-header">
         <div className="site-header-inner">
           <div className="flex items-center gap-2">
-            <button
-              className="nav-toggle"
-              aria-label="Toggle navigation menu"
-              aria-expanded={isOpen}
-              onClick={toggleNav}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
+            {!isAuthPage && (
+              <button
+                className="nav-toggle"
+                aria-label="Toggle navigation menu"
+                aria-expanded={isOpen}
+                onClick={toggleNav}
               >
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-            <Link href="/" className="brand" onClick={closeNav}>
-              <span className="brand-mark" aria-hidden="true"></span>
-              GlobeTrotter
-            </Link>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
+            )}
+            {isAuthPage ? (
+              <span className="brand" style={{ cursor: "default" }}>
+                <span className="brand-mark" aria-hidden="true"></span>
+                GlobeTrotter
+              </span>
+            ) : (
+              <Link href="/" className="brand" onClick={closeNav}>
+                <span className="brand-mark" aria-hidden="true"></span>
+                GlobeTrotter
+              </Link>
+            )}
           </div>
 
-          <div className="header-actions">
-            <Link href="/profile" className="avatar-btn" aria-label="User profile">
-              U
-            </Link>
-          </div>
+          {!isAuthPage && (
+            <div className="header-actions">
+              <Link href="/profile" className="avatar-btn" aria-label="User profile">
+                U
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 

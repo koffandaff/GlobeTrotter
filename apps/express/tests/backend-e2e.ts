@@ -392,8 +392,170 @@ async function runAllTests() {
       });
     }
 
-    // 21. Cleanup: Delete test user
+    // --- ADMIN MODULE TESTS ---
+    const adminEmail = `test.admin.${Date.now()}@globetrotter.test`;
+    let adminToken = "";
+    let testAuditLogId = "";
+
+    // A1. Register Admin User
+    await test("Admin: Register Admin Account (POST /api/auth/register)", async () => {
+      const res = await request("/auth/register", {
+        method: "POST",
+        body: {
+          firstName: "Admin",
+          lastName: "User",
+          displayName: "SuperAdmin",
+          email: adminEmail,
+          password: testPassword,
+        },
+      });
+
+      if (res.status !== 201 && res.status !== 200) {
+        throw new Error(`Admin register failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+
+      // Elevate to ADMIN in DB
+      await prisma.user.update({
+        where: { email: adminEmail },
+        data: { role: "ADMIN" },
+      });
+    });
+
+    // A2. Login Admin User
+    await test("Admin: Login Admin Account (POST /api/auth/login)", async () => {
+      const res = await request("/auth/login", {
+        method: "POST",
+        body: {
+          email: adminEmail,
+          password: testPassword,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Admin login failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+
+      adminToken =
+        res.body?.data?.tokens?.accessToken ||
+        res.body?.data?.accessToken ||
+        res.body?.accessToken;
+      if (!adminToken) {
+        throw new Error(`Admin access token missing from login response: ${JSON.stringify(res.body)}`);
+      }
+    });
+
+    // A3. RBAC Check: Regular User access to Admin routes must be rejected (403)
+    await test("Admin: RBAC Guard Rejection (GET /api/admin/stats/overview as USER)", async () => {
+      const res = await request("/admin/stats/overview", { token: accessToken });
+      if (res.status !== 403) {
+        throw new Error(`Expected 403 Forbidden for non-admin, got status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+    });
+
+    // A4. Admin: Overview Stats
+    await test("Admin: Overview Stats (GET /api/admin/stats/overview)", async () => {
+      const res = await request("/admin/stats/overview", { token: adminToken });
+      if (!res.ok) {
+        throw new Error(`Admin overview stats failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+      const data = res.body?.data || res.body;
+      if (!data.users || !data.trips || !data.activities) {
+        throw new Error(`Expected overview stats format, got ${JSON.stringify(data)}`);
+      }
+    });
+
+    // A5. Admin: Top Cities
+    await test("Admin: Top Cities (GET /api/admin/stats/top-cities)", async () => {
+      const res = await request("/admin/stats/top-cities", { token: adminToken });
+      if (!res.ok) {
+        throw new Error(`Admin top cities failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+    });
+
+    // A6. Admin: Top Activities
+    await test("Admin: Top Activities (GET /api/admin/stats/top-activities)", async () => {
+      const res = await request("/admin/stats/top-activities", { token: adminToken });
+      if (!res.ok) {
+        throw new Error(`Admin top activities failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+    });
+
+    // A7. Admin: Users List
+    let targetUserId = "";
+    await test("Admin: User Management List (GET /api/admin/users)", async () => {
+      const res = await request("/admin/users?page=1&limit=10", { token: adminToken });
+      if (!res.ok) {
+        throw new Error(`Admin list users failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+      const data = res.body?.data?.users || res.body?.users || [];
+      if (data.length > 0) {
+        targetUserId = data[0].id;
+      }
+    });
+
+    // A8. Admin: Update User Status
+    if (targetUserId) {
+      await test(`Admin: Update User Status (PATCH /api/admin/users/${targetUserId})`, async () => {
+        const res = await request(`/admin/users/${targetUserId}`, {
+          method: "PATCH",
+          token: adminToken,
+          body: {
+            status: "ACTIVE",
+          },
+        });
+        if (!res.ok) {
+          throw new Error(`Admin update user failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+        }
+      });
+    }
+
+    // Create a sample audit log if none exist
+    const adminUserRecord = await prisma.user.findUnique({ where: { email: adminEmail } });
+    if (adminUserRecord) {
+      const log = await prisma.auditLog.create({
+        data: {
+          userId: adminUserRecord.id,
+          action: "USER_LOGIN",
+          entityType: "USER",
+          entityId: adminUserRecord.id,
+          ipAddress: "127.0.0.1",
+        },
+      });
+      testAuditLogId = log.id;
+    }
+
+    // A9. Admin: System Logs List
+    await test("Admin: System Logs (GET /api/admin/logs)", async () => {
+      const res = await request("/admin/logs?page=1&limit=10", { token: adminToken });
+      if (!res.ok) {
+        throw new Error(`Admin logs list failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+    });
+
+    // A10. Admin: System Log Detail
+    if (testAuditLogId) {
+      await test(`Admin: System Log Detail (GET /api/admin/logs/${testAuditLogId})`, async () => {
+        const res = await request(`/admin/logs/${testAuditLogId}`, { token: adminToken });
+        if (!res.ok) {
+          throw new Error(`Admin log detail failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+        }
+      });
+    }
+
+    // A11. Admin: Export Logs CSV
+    await test("Admin: Export Logs CSV (GET /api/admin/logs/export)", async () => {
+      const res = await request("/admin/logs/export", { token: adminToken });
+      if (!res.ok) {
+        throw new Error(`Admin export CSV failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+    });
+
+    // Cleanup: Delete test users and logs
+    if (testAuditLogId) {
+      await prisma.auditLog.delete({ where: { id: testAuditLogId } }).catch(() => {});
+    }
     await prisma.user.delete({ where: { email: testEmail } }).catch(() => {});
+    await prisma.user.delete({ where: { email: adminEmail } }).catch(() => {});
   } finally {
     server.close();
     await prisma.$disconnect();
