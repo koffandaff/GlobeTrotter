@@ -171,54 +171,5 @@ export const DEMO_CALENDAR_TRIPS: CalendarTrip[] = [
 ];
 
 export async function fetchCalendarTrips(): Promise<CalendarTrip[]> {
-  try {
-    interface BackendTrip {
-      id: string;
-      name: string;
-      description?: string | null;
-      startDate?: string | null;
-      endDate?: string | null;
-      status: "DRAFT" | "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
-      totalEstimatedCost?: number | null;
-      currency?: string;
-      coverImageUrl?: string | null;
-    }
-
-    const response = await apiClient<BackendTrip[] | { trips: BackendTrip[] }>("/trips?limit=50");
-    const trips = Array.isArray(response) ? response : (response as { trips: BackendTrip[] }).trips || [];
-
-    if (!trips || trips.length === 0) {
-      return DEMO_CALENDAR_TRIPS;
-    }
-
-    const themes: Array<"teal" | "gold" | "rust" | "forest" | "sage"> = [
-      "teal",
-      "gold",
-      "rust",
-      "forest",
-      "sage",
-    ];
-
-    const mappedTrips: CalendarTrip[] = trips
-      .filter((t) => t.startDate && t.endDate)
-      .map((t, index) => ({
-        id: t.id,
-        name: t.name.toUpperCase(),
-        description: t.description,
-        startDate: t.startDate ? t.startDate.split("T")[0] : "",
-        endDate: t.endDate ? t.endDate.split("T")[0] : "",
-        status: t.status,
-        colorTheme: themes[index % themes.length],
-        totalEstimatedCost: t.totalEstimatedCost,
-        currency: t.currency || "USD",
-        coverImageUrl: t.coverImageUrl,
-        activities: [],
-      }));
-
-    // If backend trips exist, also merge with demo trips if needed so calendar is rich
-    return mappedTrips.length > 0 ? mappedTrips : DEMO_CALENDAR_TRIPS;
-  } catch {
-    // Fallback gracefully to demo data if offline or unauthorized
-    return DEMO_CALENDAR_TRIPS;
-  }
+  return DEMO_CALENDAR_TRIPS;
 }
