@@ -11,6 +11,7 @@ import { generateRefreshToken, hashToken } from "../../core/auth/tokens";
 import { signAccessToken } from "../../core/auth/jwt";
 import { AuthenticationError, ConflictError, NotFoundError, ValidationError } from "../../core/errors/app-error";
 import { logger } from "../../core/logger/logger";
+import { createAuditLog } from "../../core/audit/audit.service";
 import { sendOtpCode } from "../../shared/email";
 import * as authRepository from "./auth.repository";
 import type {
@@ -170,6 +171,13 @@ export async function resetPassword(input: ResetPasswordRequest): Promise<void> 
   const userId = await verifyOtpAndReturnUserId(user, input.otp);
 
   await authRepository.resetPassword(userId, await hashPassword(input.newPassword));
+  
+  await createAuditLog({
+    userId: userId,
+    action: "PASSWORD_RESET",
+    entityType: "User",
+    entityId: userId,
+  });
 }
 
 export async function acceptInvitation(input: ResetPasswordRequest): Promise<AuthUserDto> {
@@ -202,5 +210,13 @@ export async function register(input: RegisterRequest): Promise<AuthUserDto> {
   });
 
   logger.info("user registered", { userId: user.id, role: user.role });
+
+  await createAuditLog({
+    userId: user.id,
+    action: "USER_REGISTER",
+    entityType: "User",
+    entityId: user.id,
+  });
+
   return toAuthUserDto(user);
 }
