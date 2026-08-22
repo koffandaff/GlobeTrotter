@@ -24,16 +24,15 @@ export function Navigation() {
   const navLinks = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/create-trip", label: "Plan a Trip" },
-    { href: "/my-trips", label: "My Trips" },
     { href: "/itinerary-builder", label: "Itinerary Builder" },
-    { href: "/itinerary-view", label: "Itinerary View" },
-    { href: "/community", label: "Community" },
+    { href: "/my-trips", label: "My Trips" },
+    { href: "/profile", label: "Profile" },
     { href: "/city-search", label: "City Search" },
     { href: "/activity-search", label: "Activities" },
+    { href: "/itinerary-view", label: "Itinerary View" },
     { href: "/budget", label: "Budget" },
+    { href: "/community", label: "Community" },
     { href: "/calendar", label: "Calendar" },
-    { href: "/shared-itinerary", label: "Shared View" },
-    { href: "/profile", label: "Profile" },
     { href: "/admin", label: "Admin" },
   ];
 
