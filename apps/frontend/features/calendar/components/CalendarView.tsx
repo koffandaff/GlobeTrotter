@@ -15,7 +15,7 @@ import type {
 } from "../types";
 
 export function CalendarView() {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date(2026, 0, 15)); // Default Jan 2026 as per mockup
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [trips, setTrips] = useState<CalendarTrip[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -31,6 +31,14 @@ export function CalendarView() {
     try {
       const data = await fetchCalendarTrips();
       setTrips(data);
+      // Auto-navigate to first upcoming trip if available
+      const now = new Date();
+      const upcoming = data.find(t => new Date(t.startDate) >= now);
+      if (upcoming && upcoming.startDate) {
+        setCurrentDate(new Date(upcoming.startDate));
+      } else if (data.length > 0 && data[0].startDate) {
+        setCurrentDate(new Date(data[0].startDate));
+      }
     } catch {
       // Graceful fallback handled in API client
     } finally {
