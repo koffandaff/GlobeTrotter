@@ -9,6 +9,7 @@ import usersRouter from "./modules/users";
 import { dashboardRouter } from "./modules/dashboard";
 import { activitiesRouter } from "./modules/activities";
 import { tripsRouter } from "./modules/trips";
+import { stopsRouter } from "./modules/trip-stops";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(`${API_PREFIX}/users`, usersRouter);
 app.use(`${API_PREFIX}/dashboard`, dashboardRouter);
 app.use(`${API_PREFIX}/activities`, activitiesRouter);
 app.use(`${API_PREFIX}/trips`, tripsRouter);
+app.use(`${API_PREFIX}/stops`, stopsRouter);
 
 app.use((_req, res) => {
   sendError(res, "Route not found", 404, "ROUTE_NOT_FOUND");
