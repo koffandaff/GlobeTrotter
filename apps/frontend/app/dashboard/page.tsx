@@ -212,7 +212,7 @@ function DashboardPage() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
             {recentTrips.map((trip) => (
-              <Link key={trip.id} href={`/trip/${trip.id}`} className="trip-card" style={{ textDecoration: "none" }}>
+              <Link key={trip.id} href={`/itinerary-view?tripId=${trip.id}`} className="trip-card" style={{ textDecoration: "none" }}>
                 <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "flex-start" }}>
                   <div
                     className="trip-card-thumb"
@@ -277,7 +277,7 @@ function DashboardPage() {
         ) : (
           <div className="grid grid-3">
             {recommendedDestinations.map((dest) => (
-              <Link key={dest.id} href={`/city/${dest.id}`} className="card" style={{ textDecoration: "none", display: "flex", flexDirection: "column" }}>
+              <Link key={dest.id} href={`/city-search?q=${dest.name}`} className="card" style={{ textDecoration: "none", display: "flex", flexDirection: "column" }}>
                 <div
                   style={{
                     height: 120,

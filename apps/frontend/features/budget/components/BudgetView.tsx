@@ -65,6 +65,7 @@ export function BudgetView({ initialTripId }: BudgetViewProps) {
           <select
             value={tripId}
             onChange={(e) => setTripId(e.target.value)}
+            disabled={availableTrips.length === 0}
             style={{
               padding: "8px 14px",
               borderRadius: "var(--radius-sm)",
@@ -72,14 +73,18 @@ export function BudgetView({ initialTripId }: BudgetViewProps) {
               background: "#ffffff",
               fontWeight: 600,
               fontSize: "0.88rem",
-              cursor: "pointer",
+              cursor: availableTrips.length === 0 ? "not-allowed" : "pointer",
             }}
           >
-            {availableTrips.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
+            {availableTrips.length === 0 ? (
+              <option value="">No trips available</option>
+            ) : (
+              availableTrips.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))
+            )}
           </select>
 
           <button
@@ -108,10 +113,18 @@ export function BudgetView({ initialTripId }: BudgetViewProps) {
         </div>
       )}
 
-      {isLoading || !budgetData ? (
+      {isLoading ? (
         <div style={{ textAlign: "center", padding: "48px 0" }}>
           <div className="spinner" style={{ margin: "0 auto 16px" }} />
           <p>Loading financial breakdown...</p>
+        </div>
+      ) : availableTrips.length === 0 || !budgetData ? (
+        <div className="empty-state" style={{ marginTop: "40px" }}>
+          <h3>No budget data available</h3>
+          <p>You haven't created any trips or selected a valid trip.</p>
+          <Link href="/create-trip" className="btn btn-primary" style={{ marginTop: "16px" }}>
+            Plan a Trip
+          </Link>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>

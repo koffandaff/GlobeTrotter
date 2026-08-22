@@ -7,11 +7,20 @@ import { usePathname } from "next/navigation";
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const [avatar, setAvatar] = useState<string | null>(null);
 
   const toggleNav = () => setIsOpen(!isOpen);
   const closeNav = () => setIsOpen(false);
 
   const isAuthPage = pathname === "/login" || pathname === "/signup";
+
+  useEffect(() => {
+    // Read avatar from localStorage
+    const saved = localStorage.getItem("userAvatar");
+    if (saved) {
+      setAvatar(saved);
+    }
+  }, [pathname]); // Re-check when route changes (e.g. after login/profile update)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -75,8 +84,12 @@ export function Navigation() {
 
           {!isAuthPage && (
             <div className="header-actions">
-              <Link href="/profile" className="avatar-btn" aria-label="User profile">
-                U
+              <Link href="/profile" className="avatar-btn" aria-label="User profile" style={{ padding: avatar ? 0 : undefined, overflow: "hidden" }}>
+                {avatar ? (
+                  <img src={avatar} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  "VP"
+                )}
               </Link>
             </div>
           )}
