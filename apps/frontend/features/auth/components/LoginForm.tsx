@@ -56,8 +56,8 @@ export function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
       
-      if (res.data) {
-        login(res.data.accessToken, res.data.user);
+      if (res.data && res.data.tokens) {
+        login(res.data.tokens.accessToken, res.data.user);
         router.push("/");
       }
     } catch (error) {

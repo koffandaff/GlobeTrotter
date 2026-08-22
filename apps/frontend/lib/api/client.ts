@@ -8,7 +8,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     ...(options.headers as Record<string, string>),
   };
 
-  if (token) {
+  if (token && token !== "undefined" && token !== "null") {
     headers["Authorization"] = `Bearer ${token}`;
   }
 

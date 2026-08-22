@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    if (storedToken) {
+    if (storedToken && storedToken !== "undefined" && storedToken !== "null") {
       setToken(storedToken);
       fetchApi("/auth/me")
         .then((data) => {
@@ -48,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsLoading(false);
         });
     } else {
+      localStorage.removeItem("token");
       setIsLoading(false);
     }
   }, []);
