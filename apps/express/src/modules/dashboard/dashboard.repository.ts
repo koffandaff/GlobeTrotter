@@ -1,5 +1,5 @@
 import { prisma } from "../../shared/prisma";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 interface RecentTripQueryResult {
   id: string;
@@ -119,79 +119,113 @@ export async function findRecommendedDestinations(userId: string, limit = 6): Pr
 }
 
 export async function getBudgetAggregates(userId: string): Promise<BudgetAggregationResult> {
-  const result = await prisma.$queryRaw<BudgetAggregationResult[]>`
-    SELECT
-      COALESCE(SUM(tb."totalBudget"), 0) as "totalBudget",
-      COALESCE(SUM(e.amount) FILTER (WHERE e."isEstimated" = false), 0) as "totalSpent",
-      COALESCE(SUM(e.amount) FILTER (WHERE e."isEstimated" = true), 0) as "totalEstimated",
-      COALESCE(tb.currency, 'USD') as currency
-    FROM "Trip" t
-    LEFT JOIN "TripBudget" tb ON tb."tripId" = t.id
-    LEFT JOIN "Expense" e ON e."tripId" = t.id
-    WHERE t."userId" = ${userId} AND t."deletedAt" IS NULL
-    GROUP BY tb.currency
-  `;
+  const trips = await prisma.trip.findMany({
+    where: { userId, deletedAt: null },
+    select: {
+      currency: true,
+      budget: { select: { totalBudget: true } },
+      expenses: { select: { amount: true, isEstimated: true } },
+    },
+  });
 
-  return result[0] ?? { totalBudget: 0, totalSpent: 0, totalEstimated: 0, currency: "USD" };
+  let totalBudget = new Prisma.Decimal(0);
+  let totalSpent = new Prisma.Decimal(0);
+  let totalEstimated = new Prisma.Decimal(0);
+  const currency = trips[0]?.currency || "USD";
+
+  for (const trip of trips) {
+    if (trip.budget?.totalBudget) {
+      totalBudget = totalBudget.plus(trip.budget.totalBudget);
+    }
+    for (const exp of trip.expenses) {
+      if (exp.isEstimated) {
+        totalEstimated = totalEstimated.plus(exp.amount);
+      } else {
+        totalSpent = totalSpent.plus(exp.amount);
+      }
+    }
+  }
+
+  return { totalBudget, totalSpent, totalEstimated, currency };
 }
 
 export async function getCategoryBudgetBreakdown(userId: string): Promise<CategoryBudgetResult[]> {
-  return prisma.$queryRaw<CategoryBudgetResult[]>`
-    SELECT
-      e.category,
-      SUM(tb."transportBudget") FILTER (WHERE e.category = 'TRANSPORT') as budget,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = false AND e.category = 'TRANSPORT') as spent,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = true AND e.category = 'TRANSPORT') as estimated
-    FROM "Trip" t
-    LEFT JOIN "TripBudget" tb ON tb."tripId" = t.id
-    LEFT JOIN "Expense" e ON e."tripId" = t.id
-    WHERE t."userId" = ${userId} AND t."deletedAt" IS NULL
-    GROUP BY e.category
-    UNION ALL
-    SELECT
-      e.category,
-      SUM(tb."accommodationBudget") FILTER (WHERE e.category = 'ACCOMMODATION') as budget,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = false AND e.category = 'ACCOMMODATION') as spent,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = true AND e.category = 'ACCOMMODATION') as estimated
-    FROM "Trip" t
-    LEFT JOIN "TripBudget" tb ON tb."tripId" = t.id
-    LEFT JOIN "Expense" e ON e."tripId" = t.id
-    WHERE t."userId" = ${userId} AND t."deletedAt" IS NULL
-    GROUP BY e.category
-    UNION ALL
-    SELECT
-      e.category,
-      SUM(tb."activitiesBudget") FILTER (WHERE e.category = 'ACTIVITY') as budget,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = false AND e.category = 'ACTIVITY') as spent,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = true AND e.category = 'ACTIVITY') as estimated
-    FROM "Trip" t
-    LEFT JOIN "TripBudget" tb ON tb."tripId" = t.id
-    LEFT JOIN "Expense" e ON e."tripId" = t.id
-    WHERE t."userId" = ${userId} AND t."deletedAt" IS NULL
-    GROUP BY e.category
-    UNION ALL
-    SELECT
-      e.category,
-      SUM(tb."foodBudget") FILTER (WHERE e.category = 'FOOD') as budget,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = false AND e.category = 'FOOD') as spent,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = true AND e.category = 'FOOD') as estimated
-    FROM "Trip" t
-    LEFT JOIN "TripBudget" tb ON tb."tripId" = t.id
-    LEFT JOIN "Expense" e ON e."tripId" = t.id
-    WHERE t."userId" = ${userId} AND t."deletedAt" IS NULL
-    GROUP BY e.category
-    UNION ALL
-    SELECT
-      e.category,
-      SUM(tb."otherBudget") FILTER (WHERE e.category = 'OTHER') as budget,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = false AND e.category = 'OTHER') as spent,
-      SUM(e.amount) FILTER (WHERE e."isEstimated" = true AND e.category = 'OTHER') as estimated
-    FROM "Trip" t
-    LEFT JOIN "TripBudget" tb ON tb."tripId" = t.id
-    LEFT JOIN "Expense" e ON e."tripId" = t.id
-    WHERE t."userId" = ${userId} AND t."deletedAt" IS NULL
-    GROUP BY e.category
-  `;
+  const trips = await prisma.trip.findMany({
+    where: { userId, deletedAt: null },
+    select: {
+      budget: {
+        select: {
+          transportBudget: true,
+          accommodationBudget: true,
+          activitiesBudget: true,
+          foodBudget: true,
+          otherBudget: true,
+        },
+      },
+      expenses: {
+        select: {
+          category: true,
+          amount: true,
+          isEstimated: true,
+        },
+      },
+    },
+  });
+
+  const categories: Array<"TRANSPORT" | "ACCOMMODATION" | "ACTIVITY" | "FOOD" | "OTHER"> = [
+    "TRANSPORT",
+    "ACCOMMODATION",
+    "ACTIVITY",
+    "FOOD",
+    "OTHER",
+  ];
+
+  const map = new Map<string, { budget: Prisma.Decimal; spent: Prisma.Decimal; estimated: Prisma.Decimal }>();
+  for (const cat of categories) {
+    map.set(cat, {
+      budget: new Prisma.Decimal(0),
+      spent: new Prisma.Decimal(0),
+      estimated: new Prisma.Decimal(0),
+    });
+  }
+
+  for (const trip of trips) {
+    if (trip.budget) {
+      if (trip.budget.transportBudget) {
+        map.get("TRANSPORT")!.budget = map.get("TRANSPORT")!.budget.plus(trip.budget.transportBudget);
+      }
+      if (trip.budget.accommodationBudget) {
+        map.get("ACCOMMODATION")!.budget = map.get("ACCOMMODATION")!.budget.plus(trip.budget.accommodationBudget);
+      }
+      if (trip.budget.activitiesBudget) {
+        map.get("ACTIVITY")!.budget = map.get("ACTIVITY")!.budget.plus(trip.budget.activitiesBudget);
+      }
+      if (trip.budget.foodBudget) {
+        map.get("FOOD")!.budget = map.get("FOOD")!.budget.plus(trip.budget.foodBudget);
+      }
+      if (trip.budget.otherBudget) {
+        map.get("OTHER")!.budget = map.get("OTHER")!.budget.plus(trip.budget.otherBudget);
+      }
+    }
+
+    for (const exp of trip.expenses) {
+      const entry = map.get(exp.category);
+      if (entry) {
+        if (exp.isEstimated) {
+          entry.estimated = entry.estimated.plus(exp.amount);
+        } else {
+          entry.spent = entry.spent.plus(exp.amount);
+        }
+      }
+    }
+  }
+
+  return categories.map((category) => ({
+    category,
+    budget: map.get(category)!.budget,
+    spent: map.get(category)!.spent,
+    estimated: map.get(category)!.estimated,
+  }));
 }
 
 export async function getTripBudgetCounts(userId: string): Promise<TripBudgetCounts> {
@@ -200,7 +234,7 @@ export async function getTripBudgetCounts(userId: string): Promise<TripBudgetCou
       where: { userId, deletedAt: null, budget: { isNot: null } },
     }),
     prisma.trip.count({
-      where: { userId, deletedAt: null, budget: null },
+      where: { userId, deletedAt: null, budget: { is: null } },
     }),
   ]);
 
