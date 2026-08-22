@@ -1,4 +1,3 @@
-
 You are now responsible ONLY for the frontend application located at:
 
 ```text
@@ -9,13 +8,13 @@ Read `rules.md` at the repository root before making ANY changes.
 
 The frontend uses:
 
-* Next.js 16
-* React
-* TypeScript
-* App Router
-* Feature-based architecture
-* Express as the backend API
-* PostgreSQL/Prisma indirectly through the backend
+- Next.js 16
+- React
+- TypeScript
+- App Router
+- Feature-based architecture
+- Express as the backend API
+- PostgreSQL/Prisma indirectly through the backend
 
 The frontend is NOT responsible for database access.
 
@@ -130,25 +129,25 @@ Do not install multiple UI libraries for the same purpose.
 
 The application should look:
 
-* professional
-* clean
-* modern
-* understandable
-* consistent
-* responsive
+- professional
+- clean
+- modern
+- understandable
+- consistent
+- responsive
 
 Do NOT make it flashy for the sake of being flashy.
 
 Avoid:
 
-* excessive gradients
-* unnecessary animations
-* excessive shadows
-* random glassmorphism
-* giant cards
-* excessive rounded containers
-* inconsistent spacing
-* unnecessary decorative elements
+- excessive gradients
+- unnecessary animations
+- excessive shadows
+- random glassmorphism
+- giant cards
+- excessive rounded containers
+- inconsistent spacing
+- unnecessary decorative elements
 
 The interface should communicate hierarchy clearly.
 
@@ -158,18 +157,18 @@ The interface should communicate hierarchy clearly.
 
 Establish consistent rules for:
 
-* spacing
-* typography
-* buttons
-* inputs
-* cards
-* borders
-* dialogs
-* tables
-* navigation
-* colors
-* status indicators
-* error states
+- spacing
+- typography
+- buttons
+- inputs
+- cards
+- borders
+- dialogs
+- tables
+- navigation
+- colors
+- status indicators
+- error states
 
 Once a design pattern exists, reuse it.
 
@@ -201,10 +200,10 @@ Next logical action
 
 The user should always understand:
 
-* what is happening
-* what they can do
-* what went wrong
-* what to do next
+- what is happening
+- what they can do
+- what went wrong
+- what to do next
 
 ---
 
@@ -214,10 +213,10 @@ Do not leave users staring at blank screens.
 
 Use appropriate:
 
-* skeletons
-* spinners
-* disabled states
-* optimistic updates where safe
+- skeletons
+- spinners
+- disabled states
+- optimistic updates where safe
 
 Loading UI should match the content being loaded.
 
@@ -320,11 +319,11 @@ Never assume the frontend is a security boundary.
 
 The backend MUST independently enforce:
 
-* authentication
-* authorization
-* RBAC
-* resource ownership
-* validation
+- authentication
+- authorization
+- RBAC
+- resource ownership
+- validation
 
 The frontend should only mirror permissions for UX.
 
@@ -342,11 +341,11 @@ Do not duplicate authentication logic throughout components.
 
 Handle:
 
-* authenticated user
-* unauthenticated user
-* loading authentication state
-* expired authentication
-* unauthorized API responses
+- authenticated user
+- unauthenticated user
+- loading authentication state
+- expired authentication
+- unauthorized API responses
 
 Avoid infinite redirects.
 
@@ -358,13 +357,13 @@ Be careful with authentication-related client/server rendering boundaries.
 
 Forms must have:
 
-* accessible labels
-* clear validation
-* useful error messages
-* loading state
-* disabled state when appropriate
-* success feedback
-* preserved input where appropriate
+- accessible labels
+- clear validation
+- useful error messages
+- loading state
+- disabled state when appropriate
+- success feedback
+- preserved input where appropriate
 
 Use a consistent schema/validation strategy.
 
@@ -410,10 +409,10 @@ Do not create custom toast implementations for every feature.
 
 Use notifications for meaningful events such as:
 
-* successful creation
-* successful update
-* successful deletion
-* recoverable errors
+- successful creation
+- successful update
+- successful deletion
+- recoverable errors
 
 Do not spam users with unnecessary notifications.
 
@@ -431,15 +430,15 @@ Desktop
 
 Consider:
 
-* narrow screens
-* long text
-* large numbers
-* tables
-* forms
-* navigation
-* dialogs
-* empty states
-* error messages
+- narrow screens
+- long text
+- large numbers
+- tables
+- forms
+- navigation
+- dialogs
+- empty states
+- error messages
 
 Do not assume desktop width.
 
@@ -451,14 +450,14 @@ Use semantic HTML.
 
 Ensure:
 
-* keyboard navigation
-* visible focus states
-* accessible labels
-* appropriate heading hierarchy
-* accessible dialogs
-* accessible forms
-* sufficient contrast
-* meaningful button text
+- keyboard navigation
+- visible focus states
+- accessible labels
+- appropriate heading hierarchy
+- accessible dialogs
+- accessible forms
+- sufficient contrast
+- meaningful button text
 
 Do not use clickable `<div>` elements when a button/link is appropriate.
 
@@ -490,12 +489,12 @@ Do not automatically make everything client-side.
 
 Consider:
 
-* Server Components
-* client-side fetching
-* caching
-* revalidation
-* mutations
-* loading states
+- Server Components
+- client-side fetching
+- caching
+- revalidation
+- mutations
+- loading states
 
 The choice should be based on the actual UX and data requirements.
 
@@ -507,11 +506,11 @@ Do NOT introduce a global state-management library unless the application actual
 
 Prefer:
 
-* local component state
-* URL state
-* server state
-* React state
-* existing framework capabilities
+- local component state
+- URL state
+- server state
+- React state
+- existing framework capabilities
 
 Only introduce global state when there is a clear cross-feature requirement.
 
@@ -521,10 +520,10 @@ Only introduce global state when there is a clear cross-feature requirement.
 
 Use URL parameters where state should be:
 
-* shareable
-* bookmarkable
-* navigable
-* preserved on refresh
+- shareable
+- bookmarkable
+- navigable
+- preserved on refresh
 
 Examples:
 
@@ -564,10 +563,10 @@ Each route should have an intentional failure/loading experience.
 
 Never expose:
 
-* backend secrets
-* database credentials
-* private API keys
-* privileged credentials
+- backend secrets
+- database credentials
+- private API keys
+- privileged credentials
 
 through frontend code.
 
@@ -601,13 +600,13 @@ Components should have clear responsibilities.
 
 Avoid giant components containing:
 
-* API calls
-* business logic
-* form logic
-* UI
-* data transformation
-* authorization logic
-* navigation
+- API calls
+- business logic
+- form logic
+- UI
+- data transformation
+- authorization logic
+- navigation
 
 all in one file.
 
@@ -693,20 +692,20 @@ The UI should fail gracefully.
 
 Avoid unnecessary:
 
-* client components
-* API requests
-* re-renders
-* large client bundles
-* expensive computations
-* duplicated data fetching
+- client components
+- API requests
+- re-renders
+- large client bundles
+- expensive computations
+- duplicated data fetching
 
 Use appropriate:
 
-* lazy loading
-* memoization
-* caching
-* server rendering
-* image optimization
+- lazy loading
+- memoization
+- caching
+- server rendering
+- image optimization
 
 Do not optimize blindly.
 
@@ -774,22 +773,22 @@ Review for unnecessary client-side code.
 
 Never:
 
-* trust frontend RBAC as security
-* expose backend secrets
-* call the database directly
-* duplicate business logic from Express
-* scatter raw fetch calls everywhere
-* use browser alerts
-* ignore loading states
-* ignore empty states
-* ignore API errors
-* create inconsistent UI patterns
-* install multiple libraries for the same purpose
-* add global state without justification
-* make everything a Client Component
-* use `dangerouslySetInnerHTML` casually
-* hide backend authorization failures
-* silently change API contracts
+- trust frontend RBAC as security
+- expose backend secrets
+- call the database directly
+- duplicate business logic from Express
+- scatter raw fetch calls everywhere
+- use browser alerts
+- ignore loading states
+- ignore empty states
+- ignore API errors
+- create inconsistent UI patterns
+- install multiple libraries for the same purpose
+- add global state without justification
+- make everything a Client Component
+- use `dangerouslySetInnerHTML` casually
+- hide backend authorization failures
+- silently change API contracts
 
 ---
 

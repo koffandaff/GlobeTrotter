@@ -26,3 +26,10 @@ export interface UpdateUserRoleRequest {
 export interface UpdateUserStatusRequest {
   status: UserStatus;
 }
+
+export interface UpdateMeRequest {
+  firstName?: string;
+  lastName?: string;
+  language?: string;
+  avatarUrl?: string;
+}
