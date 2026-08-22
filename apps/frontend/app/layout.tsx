@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { Navigation } from "@/components/layout/Navigation";
+import { AuthProvider } from "@/lib/auth/AuthContext";
 
 export const metadata: Metadata = {
   title: {
@@ -23,11 +24,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <div className="app-shell">
-          <Navigation />
-          {children}
-          <footer className="site-footer">GlobeTrotter — Hackathon</footer>
-        </div>
+        <AuthProvider>
+          <div className="app-shell">
+            <Navigation />
+            {children}
+            <footer className="site-footer">GlobeTrotter — Hackathon</footer>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,18 +1,46 @@
-import React, { Suspense } from "react";
+import React from "react";
 import type { Metadata } from "next";
-import { DashboardView } from "@/features/dashboard/components/DashboardView";
+import { CreateTripForm } from "@/features/trips/components/CreateTripForm";
+import { SuggestionCard } from "@/components/ui/SuggestionCard";
+import { tripSuggestions } from "@/data/data";
 
 export const metadata: Metadata = {
-  title: "Dashboard Overview",
-  description: "Your GlobeTrotter travel hub, recent trips, recommendations, and budget highlights.",
+  title: "Plan a New Trip",
+  description: "Create and plan a new personalized travel itinerary.",
 };
 
-export default function DashboardPage() {
+export default function CreateTripPage() {
   return (
-    <main className="page-main">
-      <Suspense fallback={<div className="spinner" style={{ margin: "40px auto" }} />}>
-        <DashboardView />
-      </Suspense>
+    <main
+      className="page-main"
+      style={{
+        display: "flex",
+        gap: "32px",
+        flexWrap: "wrap",
+        alignItems: "flex-start",
+      }}
+    >
+      <div style={{ flex: "1 1 60%", minWidth: "300px" }}>
+        <div className="page-header">
+          <h1>Plan a new trip</h1>
+          <p>Fill in the details below to start planning your next adventure.</p>
+        </div>
+
+        <CreateTripForm />
+      </div>
+
+      <aside style={{ flex: "1 1 30%", minWidth: "300px" }}>
+        <div className="page-header">
+          <h2 style={{ fontSize: "1.25rem", margin: 0, paddingBottom: "8px" }}>
+            Suggested places to visit
+          </h2>
+        </div>
+        <div>
+          {tripSuggestions.map((suggestion) => (
+            <SuggestionCard key={suggestion.id} suggestion={suggestion} />
+          ))}
+        </div>
+      </aside>
     </main>
   );
 }
