@@ -1,13 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useDashboard } from "../hooks/useDashboard";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 export function DashboardView() {
-  const { data, isLoading, error } = useDashboard();
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { data, isLoading: isDataLoading, error } = useDashboard();
+  const router = useRouter();
 
-  if (isLoading || !data) {
+  useEffect(() => {
+    if (!isAuthLoading && !user) {
+      // Allow preview or redirect
+    }
+  }, [user, isAuthLoading, router]);
+
+  if (isAuthLoading || isDataLoading || !data) {
     return (
       <div style={{ textAlign: "center", padding: "64px 0" }}>
         <div className="spinner" style={{ margin: "0 auto 16px" }} />
@@ -19,6 +29,7 @@ export function DashboardView() {
   const upcomingCount = data.recentTrips.filter((t) => t.status !== "COMPLETED").length;
   const completedCount = data.recentTrips.filter((t) => t.status === "COMPLETED").length;
   const totalBudgetVal = data.budgetHighlights.totalBudget ?? 0;
+  const userName = user?.firstName || "Traveler";
 
   return (
     <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
@@ -35,11 +46,11 @@ export function DashboardView() {
             marginBottom: "4px",
           }}
         >
-          Travel Hub
+          Overview
         </div>
-        <h1 style={{ margin: "0 0 6px 0", fontSize: "2rem" }}>Where to next?</h1>
+        <h1 style={{ margin: "0 0 6px 0", fontSize: "2rem" }}>Where to next, {userName}?</h1>
         <p style={{ margin: 0, color: "var(--color-text-muted)", fontSize: "0.95rem" }}>
-          Here is a quick summary of your active journeys, recommendations, and budget highlights.
+          Here is a quick summary of your travel plans, destinations, and budgets.
         </p>
       </div>
 
@@ -78,7 +89,7 @@ export function DashboardView() {
           }}
         >
           <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
-            Active / Upcoming Trips
+            Upcoming Trips
           </span>
           <div style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-accent-dark)", margin: "4px 0" }}>
             {upcomingCount}
@@ -140,7 +151,7 @@ export function DashboardView() {
               View All ({data.recentTrips.length})
             </Link>
             <Link href="/create-trip" className="btn btn-primary" style={{ padding: "6px 16px", fontSize: "0.86rem", textDecoration: "none" }}>
-              + Plan a Trip
+              Plan a Trip
             </Link>
           </div>
         </div>
@@ -155,9 +166,11 @@ export function DashboardView() {
               border: "1px dashed var(--color-border)",
             }}
           >
-            <p style={{ color: "var(--color-text-muted)", marginBottom: "16px" }}>You don't have any trips planned yet.</p>
+            <p style={{ color: "var(--color-text-muted)", marginBottom: "16px" }}>
+              You don't have any trips planned right now. Let's change that!
+            </p>
             <Link href="/create-trip" className="btn btn-primary" style={{ textDecoration: "none" }}>
-              Plan Your First Trip
+              Plan a Trip
             </Link>
           </div>
         ) : (
@@ -215,10 +228,10 @@ export function DashboardView() {
         )}
       </section>
 
-      {/* Recommended Destinations Section */}
+      {/* Popular Destinations Section */}
       <section style={{ marginBottom: "40px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
-          <h2 style={{ fontSize: "1.35rem", margin: 0 }}>Recommended Destinations</h2>
+          <h2 style={{ fontSize: "1.35rem", margin: 0 }}>Popular Destinations</h2>
           <Link href="/city-search" className="btn btn-outline" style={{ padding: "6px 14px", fontSize: "0.86rem", textDecoration: "none" }}>
             Explore All Cities →
           </Link>
@@ -260,6 +273,27 @@ export function DashboardView() {
               )}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Budget Highlights Section */}
+      <section style={{ marginBottom: "20px" }}>
+        <div className="section-title-row" style={{ marginBottom: "16px" }}>
+          <h2 style={{ fontSize: "1.35rem", margin: 0 }}>Budget Highlights</h2>
+        </div>
+        <div
+          className="card"
+          style={{
+            padding: "20px 24px",
+            background: "var(--color-surface-alt)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+          }}
+        >
+          <p style={{ margin: 0, fontSize: "0.95rem" }}>
+            You have planned a total of <strong>${totalBudgetVal.toLocaleString()}</strong> across{" "}
+            {data.recentTrips.length} {data.recentTrips.length === 1 ? "trip" : "trips"}.
+          </p>
         </div>
       </section>
     </div>
