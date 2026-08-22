@@ -24,7 +24,7 @@ export const updateMeSchema = z.object({
   lastName: z.string().trim().min(1, "lastName cannot be empty").max(100).optional(),
   language: z.string().trim().max(10).optional(),
   // avatarUrl is handled by multer, but we can accept it if sent as string (e.g. they uploaded it elsewhere)
-  avatarUrl: z.string().url("avatarUrl must be a valid URL").optional(),
+  avatarUrl: z.string().optional(),
 });
 
 export const cityIdParamsSchema = z.object({

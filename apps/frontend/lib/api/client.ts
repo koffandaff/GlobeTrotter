@@ -25,11 +25,10 @@ export async function apiClient<T>(
     ...((options.headers as Record<string, string>) || {}),
   };
 
-  // Get token from options or localStorage if in browser
   const token =
     options.token ||
     (typeof window !== "undefined"
-      ? localStorage.getItem("accessToken") || localStorage.getItem("token")
+      ? localStorage.getItem("token")
       : null);
 
   // PREVENT SENDING "undefined" OR "null" STRINGS

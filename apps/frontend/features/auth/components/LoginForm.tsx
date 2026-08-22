@@ -32,13 +32,7 @@ export function LoginForm() {
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Check for saved avatar on mount
-  useEffect(() => {
-    const avatar = localStorage.getItem("userAvatar");
-    if (avatar) {
-      setSavedAvatar(avatar);
-    }
-  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,22 +91,7 @@ export function LoginForm() {
         <p>Access your trips, budgets, and saved plans.</p>
       </div>
 
-      {email.includes("@") && savedAvatar && (
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
-          <img
-            src={savedAvatar}
-            alt="User avatar"
-            style={{
-              width: "96px",
-              height: "96px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              border: "2px solid var(--color-border)",
-              boxShadow: "var(--shadow-sm)",
-            }}
-          />
-        </div>
-      )}
+
 
       <form className="card" onSubmit={handleSubmit}>
         <div className="field">

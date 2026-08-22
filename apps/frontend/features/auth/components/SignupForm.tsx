@@ -99,10 +99,19 @@ export function SignupForm() {
         method: "POST",
         body: JSON.stringify({ firstName, lastName, email, password, phone, city, country, additionalInfo }),
       });
+      
+      // Auto-login
+      const res = await fetchApi<any>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (res.data && res.data.tokens) {
+        login(res.data.tokens.accessToken, res.data.user);
+      }
+      
       setSuccess(true);
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
+      // Let the useEffect handle the redirection to dashboard
     } catch (error) {
       if (error instanceof Error) {
         setSubmitError(error.message);

@@ -59,6 +59,7 @@ export function ProfileView() {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       language: language,
+      avatarUrl: localStorage.getItem("userAvatar") || undefined,
     } as any);
     setIsSaving(false);
 
@@ -141,7 +142,15 @@ export function ProfileView() {
           }}
         >
           <div style={{ marginBottom: "16px" }}>
-            <AvatarUpload initials={initials} />
+            <AvatarUpload 
+              initials={initials} 
+              onSave={async (base64Image) => {
+                await updateProfile({
+                  avatarUrl: base64Image,
+                } as any);
+                // Also trigger refetch or let useProfile handle state update
+              }}
+            />
           </div>
 
           <h2 style={{ margin: "0 0 4px 0", fontSize: "1.3rem" }}>
@@ -333,7 +342,12 @@ export function ProfileView() {
                     <span>📍 {dest.name}, {dest.country}</span>
                     <button
                       type="button"
-                      onClick={() => removeSavedDestination(dest.id)}
+                      onClick={async () => {
+                        const res = await removeSavedDestination(dest.id);
+                        if (!res.success) {
+                          console.error(`Failed to remove destination: ${res.error}`);
+                        }
+                      }}
                       title="Remove"
                       style={{
                         background: "none",

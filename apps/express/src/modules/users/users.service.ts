@@ -1,4 +1,5 @@
 import { NotFoundError, ValidationError } from "../../core/errors/app-error";
+import { prisma } from "../../shared/prisma";
 import * as usersRepository from "./users.repository";
 import type {
   AdminUserDto,
@@ -116,4 +117,17 @@ export async function removeSavedDestination(userId: string, cityId: string) {
     }
     throw err;
   }
+}
+
+export async function getAvatarByEmail(email: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { avatarUrl: true, firstName: true, lastName: true },
+  });
+  
+  if (!user) {
+    throw new NotFoundError("user not found");
+  }
+  
+  return user;
 }

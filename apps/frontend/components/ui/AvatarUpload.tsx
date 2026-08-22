@@ -4,9 +4,10 @@ import getCroppedImg from "@/lib/canvasUtils";
 
 interface AvatarUploadProps {
   initials: string;
+  onSave?: (base64Image: string) => void;
 }
 
-export function AvatarUpload({ initials }: AvatarUploadProps) {
+export function AvatarUpload({ initials, onSave }: AvatarUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // States
@@ -89,6 +90,9 @@ export function AvatarUpload({ initials }: AvatarUploadProps) {
   const handleConfirmStaged = () => {
     setFinalImage(stagedImage);
     setStagedImage(null);
+    if (onSave && stagedImage) {
+      onSave(stagedImage);
+    }
   };
 
   const handleRemoveFinal = () => {

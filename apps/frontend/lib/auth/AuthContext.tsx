@@ -9,6 +9,7 @@ interface User {
   firstName: string;
   lastName: string;
   role: string;
+  avatarUrl?: string;
 }
 
 interface AuthContextType {
@@ -61,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userAvatar");
     setToken(null);
     setUser(null);
     // Optionally call POST /auth/logout
