@@ -14,6 +14,7 @@ import { stopsRouter } from "./modules/trip-stops";
 import { tripActivitiesRouter } from "./modules/trip-activities";
 import { itineraryViewsRouter } from "./modules/itinerary-views";
 import { citiesRouter } from "./modules/cities";
+import { communityRouter } from "./modules/community";
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use(`${API_PREFIX}/trips`, tripsRouter);
 app.use(API_PREFIX, sharingRouter);
 app.use(`${API_PREFIX}/stops`, stopsRouter);
 app.use(`${API_PREFIX}`, tripActivitiesRouter);
+app.use(`${API_PREFIX}/community`, communityRouter);
 app.use(`${API_PREFIX}`, itineraryViewsRouter);
 
 app.use((_req, res) => {

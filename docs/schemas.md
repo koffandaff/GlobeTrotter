@@ -459,3 +459,28 @@ set null if the actor is deleted, preserving history.
 > [!IMPORTANT]
 > Never make external API availability a prerequisite for any core operation.
 > Entities in PostgreSQL are canonical; sources merely create or enrich them.
+
+
+## Community Social Data (Added in 14)
+
+### trip_likes
+- **id**: UUID (PK)
+- **trip_id**: UUID (FK -> trips)
+- **user_id**: UUID (FK -> users)
+- **created_at**: Timestamp
+- *Unique Constraint*: [trip_id, user_id]
+
+### trip_comments
+- **id**: UUID (PK)
+- **trip_id**: UUID (FK -> trips)
+- **user_id**: UUID (FK -> users)
+- **content**: Text
+- **created_at**: Timestamp
+
+### user_follows
+- **id**: UUID (PK)
+- **follower_id**: UUID (FK -> users)
+- **following_id**: UUID (FK -> users)
+- **created_at**: Timestamp
+- *Unique Constraint*: [follower_id, following_id]
+
