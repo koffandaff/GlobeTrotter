@@ -1,10 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import { currentUser, trips, popularCities } from "@/data/data";
-import { StatCard } from "@/components/StatCard";
-import { TripCard } from "@/components/TripCard";
-import { EmptyState } from "@/components/EmptyState";
-import { CityTile } from "@/components/CityTile";
+import { StatCard } from "@/components/ui/StatCard";
+import { TripCard } from "@/components/ui/TripCard";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { CityTile } from "@/components/ui/CityTile";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
