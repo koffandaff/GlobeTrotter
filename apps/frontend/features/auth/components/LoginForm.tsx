@@ -1,43 +1,92 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { fetchApi } from "@/lib/api/client";
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function LoginForm() {
   const router = useRouter();
+  const { login, user, isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      if (user.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, isAuthenticated, isLoading, router]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+<<<<<<< HEAD
+  // Check for saved avatar on mount
+  React.useEffect(() => {
+    const avatar = localStorage.getItem("userAvatar");
+    if (avatar) {
+      setSavedAvatar(avatar);
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
+=======
+  const handleSubmit = async (e: React.FormEvent) => {
+>>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     e.preventDefault();
-
-    // Reset errors
     setEmailError("");
     setPasswordError("");
-
+    setSubmitError("");
     let isValid = true;
 
+<<<<<<< HEAD
     // Validate email
+=======
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+>>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     if (!emailRegex.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       isValid = false;
     }
 
-    // Validate password
     if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters long.");
       isValid = false;
     }
 
-    if (isValid) {
-      router.push("/");
+    if (!isValid) return;
+
+    try {
+      setIsSubmitting(true);
+      const res = await fetchApi("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (res.data && res.data.tokens) {
+        login(res.data.tokens.accessToken, res.data.user);
+        router.push("/");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setSubmitError(error.message);
+      } else {
+        setSubmitError(String(error));
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -48,6 +97,23 @@ export function LoginForm() {
         <h1>Log in</h1>
         <p>Access your trips, budgets, and saved plans.</p>
       </div>
+
+      {email.includes("@") && (
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
+          <img
+            src={savedAvatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(email)}`}
+            alt="User avatar"
+            style={{
+              width: "96px",
+              height: "96px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "2px solid var(--color-border)",
+              boxShadow: "var(--shadow-sm)"
+            }}
+          />
+        </div>
+      )}
 
       <form className="card" onSubmit={handleSubmit}>
         <div className="field">
@@ -107,7 +173,7 @@ export function LoginForm() {
             <input type="checkbox" style={{ minHeight: "auto" }} /> Remember me
           </label>
           <Link
-            href="#"
+            href="/forgot-password"
             className="field-hint"
             style={{ color: "var(--color-accent-dark)", fontWeight: 600 }}
           >
@@ -115,8 +181,14 @@ export function LoginForm() {
           </Link>
         </div>
 
-        <button className="btn btn-primary btn-block" type="submit">
-          Log in
+        {submitError && (
+          <div className="field-error" style={{ marginBottom: "16px", textAlign: "center" }}>
+            {submitError}
+          </div>
+        )}
+
+        <button className="btn btn-primary btn-block" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Logging in..." : "Log in"}
         </button>
       </form>
 

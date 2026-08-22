@@ -35,6 +35,10 @@ export const registerSchema = z.object({
     .optional(),
   email: emailSchema,
   password: passwordSchema,
+  phone: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  additionalInfo: z.string().max(300).optional(),
 });
 
 export const refreshSchema = z.object({

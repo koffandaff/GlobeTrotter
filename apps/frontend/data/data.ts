@@ -173,3 +173,73 @@ export const itineraryStops: ItineraryStop[] = [
     ],
   },
 ];
+
+export interface CommunityPost {
+  id: string;
+  authorName: string;
+  authorInitials: string; // e.g. "JD"
+  tripOrActivityName: string; // e.g. "South Beach Walk"
+  activityType: string; // e.g. "Sightseeing", "Food", "Adventure"
+  destination: string; // e.g. "Miami, USA"
+  content: string;
+  postedDate: string; // ISO string
+  likeCount: number;
+}
+
+export const communityPosts: CommunityPost[] = [
+  {
+    id: "post1",
+    authorName: "Alex Rivera",
+    authorInitials: "AR",
+    tripOrActivityName: "Snorkeling Tour",
+    activityType: "Adventure",
+    destination: "Key West, USA",
+    content: "Saw a sea turtle today! The water was perfectly clear and the guides were super helpful. Highly recommend adding this to your Key West itinerary.",
+    postedDate: "2026-08-18T14:30:00Z",
+    likeCount: 42,
+  },
+  {
+    id: "post2",
+    authorName: "Sarah Chen",
+    authorInitials: "SC",
+    tripOrActivityName: "Eiffel Tower at Night",
+    activityType: "Sightseeing",
+    destination: "Paris, France",
+    content: "It sparkles every hour on the hour! It gets quite crowded, so definitely book your tickets at least two months in advance to skip the line.",
+    postedDate: "2026-08-20T09:15:00Z",
+    likeCount: 128,
+  },
+  {
+    id: "post3",
+    authorName: "Marcus Johnson",
+    authorInitials: "MJ",
+    tripOrActivityName: "Cuban Dinner at Versailles",
+    activityType: "Food",
+    destination: "Miami, USA",
+    content: "Best empanadas and cafecito I've ever had. It's affordable too, coming in at just under $45 for two people. A must-visit.",
+    postedDate: "2026-08-21T18:45:00Z",
+    likeCount: 15,
+  },
+  {
+    id: "post4",
+    authorName: "Elena Rodriguez",
+    authorInitials: "ER",
+    tripOrActivityName: "Colosseum Tour",
+    activityType: "Sightseeing",
+    destination: "Rome, Italy",
+    content: "Mind-blowing history. We opted for the underground tour which gave us access to areas most tourists don't see. Wear very comfortable walking shoes!",
+    postedDate: "2026-08-15T11:20:00Z",
+    likeCount: 89,
+  },
+  {
+    id: "post5",
+    authorName: "David Kim",
+    authorInitials: "DK",
+    tripOrActivityName: "Sushi making class",
+    activityType: "Experience",
+    destination: "Tokyo, Japan",
+    content: "Such a fun experience. We learned how to properly slice sashimi and prepare the rice. Got to eat everything we made at the end!",
+    postedDate: "2026-08-22T08:10:00Z",
+    likeCount: 204,
+  }
+];
