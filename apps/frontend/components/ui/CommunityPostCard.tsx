@@ -26,7 +26,7 @@ export function CommunityPostCard({ post, onLike, isLiked }: CommunityPostCardPr
               {dateStr}
             </div>
           </div>
-          <div className="badge badge-accent">
+          <div className="badge">
             {post.destination}
           </div>
         </div>

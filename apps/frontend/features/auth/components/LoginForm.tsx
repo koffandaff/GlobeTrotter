@@ -4,15 +4,26 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function LoginForm() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  // Check for saved avatar on mount
+  React.useEffect(() => {
+    const avatar = localStorage.getItem("userAvatar");
+    if (avatar) {
+      setSavedAvatar(avatar);
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +35,6 @@ export function LoginForm() {
     let isValid = true;
 
     // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       isValid = false;
@@ -48,6 +58,23 @@ export function LoginForm() {
         <h1>Log in</h1>
         <p>Access your trips, budgets, and saved plans.</p>
       </div>
+
+      {email.includes("@") && (
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
+          <img
+            src={savedAvatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(email)}`}
+            alt="User avatar"
+            style={{
+              width: "96px",
+              height: "96px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "2px solid var(--color-border)",
+              boxShadow: "var(--shadow-sm)"
+            }}
+          />
+        </div>
+      )}
 
       <form className="card" onSubmit={handleSubmit}>
         <div className="field">

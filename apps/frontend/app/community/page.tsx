@@ -70,9 +70,9 @@ export default function CommunityPage() {
       </div>
     );
   } else {
-    // Grouping by destination
+    // Grouping
     const grouped = sorted.reduce((acc, post) => {
-      const key = post.destination;
+      const key = groupBy === "destination" ? post.destination : post.activityType;
       if (!acc[key]) acc[key] = [];
       acc[key].push(post);
       return acc;
@@ -98,7 +98,7 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="layout-content">
+    <main className="page-main" style={{ maxWidth: "1000px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
         <h1 style={{ margin: 0 }}>Community</h1>
       </div>
@@ -110,7 +110,8 @@ export default function CommunityPage() {
         onGroupByChange={setGroupBy}
         groupByOptions={[
           { label: "None", value: "none" },
-          { label: "Destination", value: "destination" }
+          { label: "Destination", value: "destination" },
+          { label: "Activity Type", value: "activityType" }
         ]}
         sortBy={sortBy}
         onSortByChange={setSortBy}
@@ -124,6 +125,6 @@ export default function CommunityPage() {
       />
 
       {content}
-    </div>
+    </main>
   );
 }
