@@ -9,8 +9,11 @@ import usersRouter from "./modules/users";
 import { dashboardRouter } from "./modules/dashboard";
 import { activitiesRouter } from "./modules/activities";
 import { tripsRouter } from "./modules/trips";
+import { sharingRouter } from "./modules/sharing";
+import { stopsRouter } from "./modules/trip-stops";
 import { tripActivitiesRouter } from "./modules/trip-activities";
 import { itineraryViewsRouter } from "./modules/itinerary-views";
+import { citiesRouter } from "./modules/cities";
 
 const app = express();
 
@@ -28,7 +31,10 @@ app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/users`, usersRouter);
 app.use(`${API_PREFIX}/dashboard`, dashboardRouter);
 app.use(`${API_PREFIX}/activities`, activitiesRouter);
+app.use(`${API_PREFIX}/cities`, citiesRouter);
 app.use(`${API_PREFIX}/trips`, tripsRouter);
+app.use(API_PREFIX, sharingRouter);
+app.use(`${API_PREFIX}/stops`, stopsRouter);
 app.use(`${API_PREFIX}`, tripActivitiesRouter);
 app.use(`${API_PREFIX}`, itineraryViewsRouter);
 
