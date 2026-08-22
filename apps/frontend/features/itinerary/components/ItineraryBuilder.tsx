@@ -29,6 +29,7 @@ export function ItineraryBuilder({ initialTripId }: ItineraryBuilderProps) {
   const [isAddStopOpen, setIsAddStopOpen] = useState(false);
   const [activeStopForActivity, setActiveStopForActivity] = useState<{ id: string; name: string } | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [deleteStopConfirm, setDeleteStopConfirm] = useState<{ id: string; name: string } | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -47,11 +48,16 @@ export function ItineraryBuilder({ initialTripId }: ItineraryBuilderProps) {
     if (res.success) showToast("Stop order updated.");
   };
 
-  const handleDeleteStop = async (stopId: string, cityName: string) => {
-    if (confirm(`Remove ${cityName} from itinerary?`)) {
-      const res = await deleteStop(stopId);
-      if (res.success) showToast("Stop removed.");
-    }
+  const handleDeleteStop = (stopId: string, cityName: string) => {
+    setDeleteStopConfirm({ id: stopId, name: cityName });
+  };
+
+  const confirmDeleteStop = async () => {
+    if (!deleteStopConfirm) return;
+    const res = await deleteStop(deleteStopConfirm.id);
+    setDeleteStopConfirm(null);
+    if (res.success) showToast("Stop removed.");
+    else showToast(res.error || "Failed to remove stop.");
   };
 
   const handleDeleteActivity = async (actId: string) => {
@@ -424,6 +430,81 @@ export function ItineraryBuilder({ initialTripId }: ItineraryBuilderProps) {
         onClose={() => setActiveStopForActivity(null)}
         onAddActivity={addActivity}
       />
+
+      {/* Delete Stop Confirmation Modal */}
+      {deleteStopConfirm && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: "fixed",
+            top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "16px",
+          }}
+        >
+          <div
+            onClick={() => setDeleteStopConfirm(null)}
+            style={{
+              position: "absolute",
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: "rgba(36, 53, 46, 0.6)",
+              backdropFilter: "blur(3px)",
+            }}
+          />
+          <div
+            className="card"
+            style={{
+              position: "relative",
+              zIndex: 10000,
+              background: "#ffffff",
+              maxWidth: "420px",
+              width: "100%",
+              borderRadius: "var(--radius-md)",
+              boxShadow: "var(--shadow-md)",
+              padding: "28px",
+              border: "1px solid var(--color-border)",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: "2.5rem", marginBottom: "12px" }}>🗺️</div>
+            <h2 style={{ fontSize: "1.25rem", margin: "0 0 8px" }}>Remove Destination?</h2>
+            <p style={{ color: "var(--color-text-muted)", fontSize: "0.92rem", marginBottom: "24px" }}>
+              Are you sure you want to remove <strong>{deleteStopConfirm.name}</strong> from your itinerary?
+              All activities for this stop will also be deleted.
+            </p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+              <button
+                type="button"
+                onClick={() => setDeleteStopConfirm(null)}
+                className="btn btn-outline"
+                style={{ padding: "10px 24px" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteStop}
+                className="btn"
+                style={{
+                  padding: "10px 24px",
+                  background: "var(--color-danger)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "var(--radius-sm)",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Yes, Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
