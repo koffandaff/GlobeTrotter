@@ -32,30 +32,22 @@ export function LoginForm() {
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-<<<<<<< HEAD
   // Check for saved avatar on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const avatar = localStorage.getItem("userAvatar");
     if (avatar) {
       setSavedAvatar(avatar);
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-=======
   const handleSubmit = async (e: React.FormEvent) => {
->>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     e.preventDefault();
     setEmailError("");
     setPasswordError("");
     setSubmitError("");
     let isValid = true;
 
-<<<<<<< HEAD
     // Validate email
-=======
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
->>>>>>> 1f435aac31cd9d3d749f219451527a9ead211e29
     if (!emailRegex.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       isValid = false;
@@ -70,14 +62,21 @@ export function LoginForm() {
 
     try {
       setIsSubmitting(true);
-      const res = await fetchApi("/auth/login", {
+      const res = await fetchApi<{
+        user: { id: string; email: string; firstName: string; lastName: string; role: string };
+        tokens: { accessToken: string; refreshToken?: string };
+      }>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
-      
+
       if (res.data && res.data.tokens) {
         login(res.data.tokens.accessToken, res.data.user);
-        router.push("/");
+        if (res.data.user.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -109,7 +108,7 @@ export function LoginForm() {
               borderRadius: "50%",
               objectFit: "cover",
               border: "2px solid var(--color-border)",
-              boxShadow: "var(--shadow-sm)"
+              boxShadow: "var(--shadow-sm)",
             }}
           />
         </div>
